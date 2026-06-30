@@ -6,11 +6,18 @@ on:
       profile:
         description: Firmware partition layout
         required: true
-        default: ubootmod
+        default: mod112
         type: choice
         options:
+          - mod112
           - stock
-          - ubootmod
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tr3000-${{ github.ref }}-${{ inputs.profile }}
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -41,25 +48,18 @@ jobs:
             pkgconf python3 python3-pip python3-ply python3-docutils \
             python3-pyelftools qemu-utils re2c rsync scons squashfs-tools \
             subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto \
-            xxd zlib1g-dev zstd
+            u-boot-tools xxd zlib1g-dev zstd
 
       - name: Cache downloads
         uses: actions/cache@v4
         with:
           path: dl
-          key: tr3000-dl-${{ hashFiles('feeds.conf.default', 'defconfig/cudy-tr3000-v1-*.config') }}
+          key: tr3000-dl-${{ hashFiles('feeds.conf.default', 'defconfig/cudy-tr3000-*.config') }}
           restore-keys: tr3000-dl-
 
-      - name: Build stock firmware
-        if: inputs.profile == 'stock'
+      - name: Build firmware
         env:
-          PROFILE: stock
-        run: ./build-tr3000.sh
-
-      - name: Build U-Boot MOD firmware
-        if: inputs.profile == 'ubootmod'
-        env:
-          PROFILE: ubootmod
+          PROFILE: ${{ inputs.profile }}
         run: ./build-tr3000.sh
 
       - name: Upload firmware
@@ -68,7 +68,4 @@ jobs:
           name: cudy-tr3000-${{ inputs.profile }}
           if-no-files-found: error
           retention-days: 14
-          path: |
-            bin/targets/mediatek/filogic/*cudy_tr3000-v1*
-            bin/targets/mediatek/filogic/profiles.json
-            bin/targets/mediatek/filogic/sha256sums
+          path: artifacts/${{ inputs.profile }}/

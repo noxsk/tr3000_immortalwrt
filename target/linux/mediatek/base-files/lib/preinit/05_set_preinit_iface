@@ -1,6 +1,7 @@
 set_preinit_iface() {
 	case $(board_name) in
 	cudy,m3000-v1|\
+	cudy,tr3000-mod|\
 	cudy,tr3000-v1|\
 	cudy,tr3000-v1-ubootmod|\
 	glinet,gl-mt3000|\
@@ -43,4 +44,3 @@ set_preinit_iface() {
 }
 
 boot_hook_add preinit_main set_preinit_iface
-

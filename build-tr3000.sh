@@ -19,18 +19,26 @@ if (( EUID == 0 )); then
   echo "提示：检测到 root 构建，已启用 GNU configure root 兼容模式。" >&2
 fi
 
-PROFILE="${PROFILE:-ubootmod}"
+PROFILE="${PROFILE:-mod112}"
 case "$PROFILE" in
   stock)
     DEFCONFIG="defconfig/cudy-tr3000-v1-stock.config"
     DEVICE_SYMBOL="CONFIG_TARGET_DEVICE_mediatek_filogic_DEVICE_cudy_tr3000-v1=y"
+    IMAGE_STEM="cudy_tr3000-v1"
+    EXPECTED_BOARD="cudy_tr3000-v1"
+    EXPECTED_COMPATIBLE="cudy,tr3000-v1"
+    EXPECTED_UBI_SIZE="0x4000000"
     ;;
-  ubootmod)
-    DEFCONFIG="defconfig/cudy-tr3000-v1-ubootmod.config"
-    DEVICE_SYMBOL="CONFIG_TARGET_DEVICE_mediatek_filogic_DEVICE_cudy_tr3000-v1-ubootmod=y"
+  mod112)
+    DEFCONFIG="defconfig/cudy-tr3000-mod-112m.config"
+    DEVICE_SYMBOL="CONFIG_TARGET_DEVICE_mediatek_filogic_DEVICE_cudy_tr3000-mod=y"
+    IMAGE_STEM="cudy_tr3000-mod"
+    EXPECTED_BOARD="cudy_tr3000-mod"
+    EXPECTED_COMPATIBLE="cudy,tr3000-mod"
+    EXPECTED_UBI_SIZE="0x7000000"
     ;;
   *)
-    echo "错误：PROFILE 只能是 stock 或 ubootmod。" >&2
+    echo "错误：PROFILE 只能是 stock 或 mod112。" >&2
     exit 1
     ;;
 esac
@@ -57,6 +65,32 @@ if ! make -j"$JOBS"; then
   make -j1 V=s
 fi
 
+OUTPUT_DIR="$ROOT_DIR/bin/targets/mediatek/filogic"
+shopt -s nullglob
+FIRMWARE_FILES=("$OUTPUT_DIR"/*mediatek-filogic-"$IMAGE_STEM"-squashfs-sysupgrade.bin)
+shopt -u nullglob
+
+if (( ${#FIRMWARE_FILES[@]} != 1 )); then
+  echo "错误：预期找到 1 个 $IMAGE_STEM sysupgrade.bin，实际找到 ${#FIRMWARE_FILES[@]} 个。" >&2
+  exit 1
+fi
+
+"$ROOT_DIR/scripts/verify-tr3000-image.sh" \
+  "${FIRMWARE_FILES[0]}" \
+  "$EXPECTED_BOARD" \
+  "$EXPECTED_COMPATIBLE" \
+  "$EXPECTED_UBI_SIZE"
+
+ARTIFACT_DIR="$ROOT_DIR/artifacts/$PROFILE"
+mkdir -p "$ARTIFACT_DIR"
+cp -f "${FIRMWARE_FILES[0]}" "$ARTIFACT_DIR/"
+(
+  cd "$ARTIFACT_DIR"
+  sha256sum "$(basename "${FIRMWARE_FILES[0]}")" > sha256sums
+)
+
 echo
 echo "构建完成，固件目录："
-echo "$ROOT_DIR/bin/targets/mediatek/filogic/"
+echo "$OUTPUT_DIR/"
+echo "可刷写固件：${FIRMWARE_FILES[0]}"
+echo "GitHub Actions 产物目录：$ARTIFACT_DIR/"

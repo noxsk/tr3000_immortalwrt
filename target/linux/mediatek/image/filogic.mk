@@ -878,6 +878,22 @@ define Device/cudy_tr3000-v1
 endef
 TARGET_DEVICES += cudy_tr3000-v1
 
+define Device/cudy_tr3000-mod
+  DEVICE_VENDOR := Cudy
+  DEVICE_MODEL := TR3000
+  DEVICE_VARIANT := v1 (multi-layout U-Boot, 112M)
+  DEVICE_DTS := mt7981b-cudy-tr3000-mod
+  DEVICE_DTS_DIR := ../dts
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 114688k
+  KERNEL_IN_UBI := 1
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware automount
+endef
+TARGET_DEVICES += cudy_tr3000-mod
+
 define Device/cudy_tr3000-v1-ubootmod
   DEVICE_VENDOR := Cudy
   DEVICE_MODEL := TR3000
