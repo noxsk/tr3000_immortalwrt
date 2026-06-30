@@ -11,6 +11,14 @@ if [[ "$(uname -s)" != "Linux" ]]; then
   exit 1
 fi
 
+# GNU packages which probe mknod deliberately reject configure runs as root.
+# Root builds are common in disposable cloud VMs and containers, so make the
+# required opt-in available to every configure subprocess spawned by make.
+if (( EUID == 0 )); then
+  export FORCE_UNSAFE_CONFIGURE=1
+  echo "提示：检测到 root 构建，已启用 GNU configure root 兼容模式。" >&2
+fi
+
 PROFILE="${PROFILE:-ubootmod}"
 case "$PROFILE" in
   stock)

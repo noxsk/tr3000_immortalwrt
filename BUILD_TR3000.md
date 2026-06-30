@@ -27,6 +27,8 @@ chmod +x build-tr3000.sh
 ./build-tr3000.sh
 ```
 
+建议使用普通用户编译。如果在一次性云主机或容器中以 `root` 运行，脚本会自动启用 GNU configure 的 root 兼容模式，无需手动设置 `FORCE_UNSAFE_CONFIGURE`。
+
 以上命令默认构建 MOD U-Boot 112M UBI 布局。重复构建且 feeds 已经更新时，可以执行：
 
 ```bash
