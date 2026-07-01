@@ -1,8 +1,8 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "This page controls the official AdGuard Home package. On first start, open the web interface to complete its setup."
-msgstr "此页面用于管理官方 AdGuard Home 软件包。首次启动后，请打开 Web 界面完成初始化设置。"
+msgid "AdGuard Home starts by default on DNS port 53. dnsmasq remains on port 54 for DHCP and local-name resolution."
+msgstr "AdGuard Home 默认启动并监听 DNS 53 端口；dnsmasq 保留在 54 端口，继续提供 DHCP 和本地主机名解析。"
 
 msgid "Service status"
 msgstr "服务状态"

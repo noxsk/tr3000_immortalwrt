@@ -98,7 +98,9 @@ mtwifi_defs.chip_cfgs = {
 
 mtwifi_defs.reinstall_cfgs = {
     "BssidNum", "WHNAT", "E2pAccessMode",
-    "HT_RxStream", "HT_TxStream", "WdsEnable"
+    "HT_RxStream", "HT_TxStream", "WdsEnable",
+    -- APCLI MAC addresses are read only while the MTK driver is loading.
+    "ApcliMacAddress", "ApcliMacAddress1"
 }
 
 mtwifi_defs.iwpriv_ap_cfgs = {

@@ -40,7 +40,7 @@ return view.extend({
 		let m, s, o;
 
 		m = new form.Map('adguardhome', _('AdGuard Home'),
-			_('This page controls the official AdGuard Home package. On first start, open the web interface to complete its setup.'));
+			_('AdGuard Home starts by default on DNS port 53. dnsmasq remains on port 54 for DHCP and local-name resolution.'));
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;

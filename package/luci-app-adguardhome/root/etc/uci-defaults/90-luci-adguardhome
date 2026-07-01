@@ -1,9 +1,19 @@
 #!/bin/sh
 
 if uci -q get adguardhome.config >/dev/null; then
+	uci -q set adguardhome.config.enabled='1'
 	uci -q get adguardhome.config.web_port >/dev/null || \
 		uci -q set adguardhome.config.web_port='3000'
 	uci -q commit adguardhome
 fi
+
+# Keep dnsmasq as the DHCP server and resolver for local names,
+# but release the standard DNS port for AdGuard Home.
+if uci -q get dhcp.@dnsmasq[0] >/dev/null; then
+	uci -q set dhcp.@dnsmasq[0].port='54'
+	uci -q commit dhcp
+fi
+
+[ ! -x /etc/init.d/adguardhome ] || /etc/init.d/adguardhome enable
 
 exit 0
