@@ -280,10 +280,26 @@ static VOID phy_freq_get_max(struct wifi_dev *wdev, struct freq_oper *result)
 	}
 }
 
+#ifdef CONFIG_AP_SUPPORT
+static BOOLEAN phy_freq_get_target_oper(struct wifi_dev *wdev, UCHAR prim_ch,
+						struct freq_oper *oper)
+{
+	struct freq_cfg cfg;
+
+	phy_freq_get_cfg(wdev, &cfg);
+	cfg.prim_ch = prim_ch;
+
+	return phy_freq_adjust(wdev, &cfg, oper);
+}
+#endif
+
 static VOID phy_freq_decision(struct wifi_dev *wdev, struct freq_oper *want, struct freq_oper *result)
 {
 	struct _RTMP_ADAPTER *ad = (struct _RTMP_ADAPTER *)wdev->sys_handle;
 	struct wifi_dev *cur_wdev;
+#ifdef CONFIG_AP_SUPPORT
+	struct freq_oper target_oper;
+#endif
 	UCHAR i;
 	/*basic setting*/
 	os_move_mem(result, want, sizeof(struct freq_oper));
@@ -294,8 +310,28 @@ static VOID phy_freq_decision(struct wifi_dev *wdev, struct freq_oper *want, str
 
 		if (cur_wdev &&
 			wlan_operate_get_state(cur_wdev) &&
-			wmode_band_equal(wdev->PhyMode, cur_wdev->PhyMode))
+			wmode_band_equal(wdev->PhyMode, cur_wdev->PhyMode)) {
+#ifdef CONFIG_AP_SUPPORT
+			/*
+			 * APCLI may use a narrower bandwidth than the local AP.  When
+			 * APCLI changes channel, calculate the AP bandwidth on the target
+			 * channel from its own configuration.  Regulatory channel limits
+			 * are applied by phy_freq_adjust(), e.g. HE160 falls back to 80 MHz
+			 * on an upper-band channel which cannot carry 160 MHz.
+			 */
+			if ((wdev->wdev_type == WDEV_TYPE_STA) &&
+				(cur_wdev != wdev) &&
+				(cur_wdev->wdev_type == WDEV_TYPE_AP) &&
+				phy_freq_get_target_oper(cur_wdev, want->prim_ch,
+								 &target_oper)) {
+				if (target_oper.bw > result->bw)
+					os_move_mem(result, &target_oper,
+								sizeof(struct freq_oper));
+				continue;
+			}
+#endif
 			phy_freq_get_max(cur_wdev, result);
+		}
 	}
 }
 
@@ -367,6 +403,9 @@ VOID operate_loader_phy(struct wifi_dev *wdev, struct freq_cfg *cfg)
 {
 	struct freq_oper oper_dev;
 	struct freq_oper oper_radio;
+#ifdef CONFIG_AP_SUPPORT
+	struct freq_oper target_oper;
+#endif
 	struct radio_res res;
 	UCHAR i = 0;
 	UCHAR band_idx = 0;
@@ -470,6 +509,21 @@ VOID operate_loader_phy(struct wifi_dev *wdev, struct freq_cfg *cfg)
 		if (tdev && (band_idx == HcGetBandByWdev(tdev))) {
 			if (tdev == wdev)
 				continue;
+
+#ifdef CONFIG_AP_SUPPORT
+			/*
+			 * Do not copy an APCLI's negotiated 20/40 MHz bandwidth to the
+			 * local AP.  Keep the AP's configured bandwidth, capped only by
+			 * the capability of the channel selected by APCLI.
+			 */
+			if ((wdev->wdev_type == WDEV_TYPE_STA) &&
+				(tdev->wdev_type == WDEV_TYPE_AP) &&
+				phy_freq_get_target_oper(tdev, oper_dev.prim_ch,
+								 &target_oper)) {
+				phy_freq_update(tdev, &target_oper);
+				continue;
+			}
+#endif
 			phy_freq_update(tdev, &oper_dev);
 		}
 	}
@@ -689,4 +743,3 @@ BOOLEAN wlan_operate_scan(struct wifi_dev *wdev, UCHAR prim_ch)
 	ret = hc_radio_res_request(wdev, res);
 	return ret;
 }
-
