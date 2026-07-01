@@ -8,13 +8,22 @@ function debug_info_write(devname,content)
 end
 
 function token(str, n, default)
-    local i = 1
-    local list = {}
-    for k in string.gmatch(str, "([^;]+)") do
-        list[i] = k
+	if not str then return default end
+	local i = 1
+	local list = {}
+	for k in string.gmatch(str..";", "(.-);") do
+		list[i] = k
         i = i + 1
     end
     return list[tonumber(n)] or default
+end
+
+function any_token_enabled(str)
+	if not str then return false end
+	for value in string.gmatch(str..";", "(.-);") do
+		if value == "1" then return true end
+	end
+	return false
 end
 
 function GetFileSize( filename )
@@ -64,13 +73,18 @@ function __set_wifi_apcli_security(cfgs, diff, device, devname)
     local num = math.max(#encr_old_i, #encr_new_i)
     for i = 1, num do
         local changed = false
+        local psk_key = i == 1 and "ApCliWPAPSK" or "ApCliWPAPSK"..tostring(i-1)
         if next(auth_new) and auth_old_i[i] ~= auth_new_i[i] then
             changed = true
         elseif next(encr_new) and encr_old_i[i] ~= encr_new_i[i] then
             changed = true
         elseif next(keyid_new) and keyid_old_i[i] ~= keyid_new_i[i] then
             changed = true
-        elseif diff["ApCliWPAPSK"] then
+        elseif diff[psk_key] then
+            changed = true
+        elseif diff.ApCliSsid and token(cfgs.ApCliSsid, i, "") ~= token(diff.ApCliSsid[2], i, "") then
+            changed = true
+        elseif diff.ApCliEnable and token(cfgs.ApCliEnable, i, "0") ~= token(diff.ApCliEnable[2], i, "0") then
             changed = true
         else
             -- just support apcli0/apclii0/apclix0
@@ -95,8 +109,8 @@ function __set_wifi_apcli_security(cfgs, diff, device, devname)
             --vif.WEPType = "WEP"..tostring(vif.KeyID).."Type"
             --vif.WEPTypeVal = diff["WEP"..tostring(vif.KeyID).."Type"..tostring(i)] and
                         --diff["WEP"..tostring(vif.KeyID).."Type"..tostring(i)][2] or cfgs["WEP"..tostring(vif.KeyID).."Type"..tostring(i)]
-            vif.WPAPSK = diff["ApCliWPAPSK"] and diff["ApCliWPAPSK"][2] or cfgs["ApCliWPAPSK"]
-            vif.SSID = diff["ApCliSsid"] and diff["ApCliSsid"][2] or cfgs["ApCliSsid"]
+            vif.WPAPSK = diff[psk_key] and diff[psk_key][2] or cfgs[psk_key]
+            vif.SSID = token(diff.ApCliSsid and diff.ApCliSsid[2] or cfgs.ApCliSsid, i, "")
             table.insert(vifs, vif)
         end
     end
@@ -998,8 +1012,8 @@ function quick_settings(devname,path)
     device = devs.devname_ridx[devname]
 
     -- need to set Authmode and Encry before MFPC&MFPR
-    if cfgs["ApCliEnable"] and cfgs["ApCliEnable"] == "1" or
-        diff["ApCliEnable"] and diff["ApCliEnable"][2] =="1" then
+    if any_token_enabled(cfgs["ApCliEnable"]) or
+        (diff["ApCliEnable"] and any_token_enabled(diff["ApCliEnable"][2])) then
         __set_wifi_apcli_security(cfgs, diff, device, devname)
     end
 

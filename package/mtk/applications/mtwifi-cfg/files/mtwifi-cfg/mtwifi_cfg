@@ -370,8 +370,9 @@ function mtwifi_cfg_setup(argv)
         nixio.syslog("err", "mtwifi-cfg: too many vifs!")
         return
     end
-    if apcli_num > 1 then
-        nixio.syslog("err", "mtwifi-cfg: only support one apcli vif!")
+    if apcli_num > defs.max_apcli then
+        nixio.syslog("err", "mtwifi-cfg: too many apcli vifs!")
+        return
     end
 
     if bssid_num > 0 then
@@ -381,39 +382,58 @@ function mtwifi_cfg_setup(argv)
     end
 
     -- setup apcli
-    dats.ApCliEnable = 0
-    dats.ApCliSsid = ""
-    dats.ApCliBssid = ""
-    dats.MACRepeaterEn = 0
-    dats.ApcliMacAddress = ""
-    dats.ApCliAuthMode = ""
-    dats.ApCliEncrypType = ""
-    dats.ApCliWPAPSK = ""
-    dats.ApCliPMFMFPC = 0
-    dats.ApCliPMFMFPR = 0
-    dats.ApCliPMFSHA256 = 0
-
-    for _,v in pairs(cfg.interfaces) do
-        if v.config.mode == "sta" then
-            if not v.config.disabled then
-                dats.ApCliEnable = 1
-            end
-            dats.ApCliSsid = v.config.ssid or ""
-            dats.ApCliBssid = v.config.bssid or ""
-            dats.MACRepeaterEn = (v.config.bssid and v.config.bssid ~= "") and 1 or 0
-            dats.ApcliMacAddress = v.config.macaddr or ""
-            dats.ApCliAuthMode = defs.enc2dat[v.config.encryption][1]
-            dats.ApCliEncrypType = defs.enc2dat[v.config.encryption][2]
-            dats.ApCliWPAPSK = v.config.key or ""
-
-            if dats.ApCliAuthMode == "OWE" or dats.ApCliAuthMode == "WPA3PSK" then
-                dats.ApCliPMFMFPC = 1
-                dats.ApCliPMFMFPR = 1
-                dats.ApCliPMFSHA256 = 0
-            end
-            break
+    local apcli_cfgs = {}
+    for idx = 0, vif_num - 1 do
+        local vif = cfg.interfaces[tostring(idx)]
+        if vif.config.mode == "sta" then
+            apcli_cfgs[#apcli_cfgs + 1] = vif
         end
     end
+
+    local apcli_enable = {}
+    local apcli_ssid = {}
+    local apcli_bssid = {}
+    local apcli_auth = {}
+    local apcli_encryp = {}
+    local apcli_mfpc = {}
+    local apcli_mfpr = {}
+    local apcli_sha256 = {}
+
+    dats.MACRepeaterEn = 0
+    for idx = 0, defs.max_apcli - 1 do
+        local key_suffix = idx == 0 and "" or tostring(idx)
+        local v = apcli_cfgs[idx + 1]
+        local encryption = v and (defs.enc2dat[v.config.encryption] or defs.enc2dat.none) or defs.enc2dat.none
+        local auth = encryption[1]
+
+        apcli_enable[idx + 1] = (v and not v.config.disabled) and 1 or 0
+        -- MTK's profile tokenizer skips empty fields, so disabled slots need
+        -- harmless placeholders to keep all following APCLI indices aligned.
+        apcli_ssid[idx + 1] = v and (v.config.ssid or " ") or " "
+        apcli_bssid[idx + 1] = v and (v.config.bssid or "00:00:00:00:00:00") or "00:00:00:00:00:00"
+        apcli_auth[idx + 1] = auth
+        apcli_encryp[idx + 1] = encryption[2]
+        apcli_mfpc[idx + 1] = (auth == "OWE" or auth == "WPA3PSK") and 1 or 0
+        apcli_mfpr[idx + 1] = apcli_mfpc[idx + 1]
+        apcli_sha256[idx + 1] = 0
+
+        dats["ApCliWPAPSK"..key_suffix] = v and (v.config.key or "") or ""
+        dats["ApcliMacAddress"..key_suffix] = v and (v.config.macaddr or "") or ""
+
+        if v and v.config.bssid and v.config.bssid ~= "" then
+            dats.MACRepeaterEn = 1
+        end
+    end
+
+    -- Keep empty slots in place: the driver uses token position as the APCLI index.
+    dats.ApCliEnable = table.concat(apcli_enable, ";")
+    dats.ApCliSsid = table.concat(apcli_ssid, ";")
+    dats.ApCliBssid = table.concat(apcli_bssid, ";")
+    dats.ApCliAuthMode = table.concat(apcli_auth, ";")
+    dats.ApCliEncrypType = table.concat(apcli_encryp, ";")
+    dats.ApCliPMFMFPC = table.concat(apcli_mfpc, ";")
+    dats.ApCliPMFMFPR = table.concat(apcli_mfpr, ";")
+    dats.ApCliPMFSHA256 = table.concat(apcli_sha256, ";")
 
     -- setup chip cfgs
     set_chip_cfg(cfg, dats)
@@ -497,6 +517,8 @@ function mtwifi_cfg_setup(argv)
             WirelessMode = 15 -- PHY_11VHT_N_MIXED
         end
     end
+
+    dats.ApCliWirelessMode = table.concat({WirelessMode, WirelessMode}, ";")
 
     -- reset vif cfgs to default
     for k,v in pairs(defs.vif_cfgs) do

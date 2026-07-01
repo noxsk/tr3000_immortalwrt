@@ -307,6 +307,7 @@ VOID MSTA_Init(RTMP_ADAPTER *pAd, RTMP_OS_NETDEV_OP_HOOK *pNetDevOps)
 #ifdef CONFIG_APSTA_MIXED_SUPPORT
 #ifdef MULTI_PROFILE
 		UCHAR final_name[32] = "";
+		UINT32 ifname_idx = idx;
 #endif
 #endif /*CONFIG_APSTA_MIXED_SUPPORT*/
 
@@ -330,12 +331,14 @@ VOID MSTA_Init(RTMP_ADAPTER *pAd, RTMP_OS_NETDEV_OP_HOOK *pNetDevOps)
 				break;
 			}
 			multi_profile_apcli_devname_req(pAd, final_name, &idx);
-			/* MULTI_PROFILE=enable && dbdc_mode=TRUE, apcli interface name will be apcli0,apclix0 */
+			/* Each DBDC band owns MAX_APCLI_NUM_PER_BAND numbered interfaces. */
+			if (pAd->CommonCfg.dbdc_mode == TRUE && idx < MAX_APCLI_NUM_DEFAULT)
+				ifname_idx = idx % MAX_APCLI_NUM_PER_BAND;
 			pDevNew = RtmpOSNetDevCreate(
 				MC_RowID,
 				&IoctlIF,
 				inf_type,
-				(pAd->CommonCfg.dbdc_mode == TRUE) ? 0 : idx,
+				ifname_idx,
 				sizeof(struct mt_dev_priv),
 				final_name,
 				TRUE);

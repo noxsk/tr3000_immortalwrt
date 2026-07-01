@@ -10,7 +10,7 @@ init_wireless_driver "$@"
 LOCK_FILE="/tmp/mtwifi.lock"
 
 MTWIFI_MAX_AP_IDX=15
-MTWIFI_MAX_APCLI_IDX=0
+MTWIFI_MAX_APCLI_IDX=1
 MTWIFI_CFG_IFNAME_KEY="mtwifi_ifname"
 
 drv_mtwifi_init_device_config() {

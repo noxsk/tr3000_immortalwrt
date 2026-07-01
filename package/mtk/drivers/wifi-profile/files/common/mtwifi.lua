@@ -23,6 +23,18 @@ local function esc(x)
             :gsub('%?', '%%?'))
 end
 
+local function apcli_enabled(config, ifname, prefix)
+    local idx = tonumber(string.match(ifname, esc(prefix).."([0-9]+)$"))
+    if idx == nil or not config then return false end
+
+    local current = 0
+    for value in string.gmatch(config..";", "(.-);") do
+        if current == idx then return value == "1" end
+        current = current + 1
+    end
+    return false
+end
+
 function add_vif_into_lan(vif)
     local mtkwifi = require("mtkwifi")
     local brvifs = string.split(mtkwifi.__trim((mtkwifi.read_pipe("ls /sys/class/net/br-lan/brif/"))))
@@ -192,7 +204,7 @@ function mtwifi_up(devname)
             if vif ~= dev.main_ifname and
             (  string.match(vif, esc(dev.ext_ifname).."[0-9]+")
             or (string.match(vif, esc(dev.apcli_ifname).."[0-9]+") and
-                cfgs.ApCliEnable ~= "0" and cfgs.ApCliEnable ~= "")
+                apcli_enabled(cfgs.ApCliEnable, vif, dev.apcli_ifname))
             or (string.match(vif, esc(dev.wds_ifname).."[0-9]+") and
                 cfgs.WdsEnable ~= "0" and cfgs.WdsEnable ~= "")
             or string.match(vif, esc(dev.mesh_ifname).."[0-9]+"))
@@ -207,7 +219,7 @@ function mtwifi_up(devname)
             end
 
             if string.match(vif, esc(dev.apcli_ifname).."[0-9]+") and
-                cfgs.ApCliEnable ~= "0" and cfgs.ApCliEnable ~= "" then
+                apcli_enabled(cfgs.ApCliEnable, vif, dev.apcli_ifname) then
                 -- enable apcli auto connect by default
                 -- ApCliAutoConnect: 1=User Trigger Scan Mode 2=Partial Scan Mode 3=Driver Trigger Scan ModeW
                 os.execute("iwpriv "..vif.." set ApCliEnable=1")

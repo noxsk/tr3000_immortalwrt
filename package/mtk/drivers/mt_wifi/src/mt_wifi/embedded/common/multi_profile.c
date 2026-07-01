@@ -715,14 +715,27 @@ static INT multi_profile_merge_mac_address(
 
 #ifdef CONFIG_APSTA_MIXED_SUPPORT
 	/* apcli mac addr */
-	if (RTMPGetKeyParameter("ApcliMacAddress", tmpbuf, 25, buf2, TRUE)) {
-		ret = snprintf(tok_str, sizeof(tok_str), "ApcliMacAddress1");
+	for (i = 0; i < MAX_APCLI_NUM_PER_BAND; i++) {
+		if (i == 0)
+			ret = snprintf(tok_str, sizeof(tok_str), "ApcliMacAddress");
+		else
+			ret = snprintf(tok_str, sizeof(tok_str), "ApcliMacAddress%d", i);
 		if (os_snprintf_error(sizeof(tok_str), ret)) {
 			MTWF_DBG(NULL, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_ERROR,
 					 "tok_str snprintf error!!!\n");
 			return NDIS_STATUS_FAILURE;
 		}
-		RTMPAddKeyParameter(tok_str, tmpbuf, 25, final);
+
+		if (RTMPGetKeyParameter(tok_str, tmpbuf, 25, buf2, TRUE)) {
+			ret = snprintf(tok_str, sizeof(tok_str), "ApcliMacAddress%d",
+					       MAX_APCLI_NUM_PER_BAND + i);
+			if (os_snprintf_error(sizeof(tok_str), ret)) {
+				MTWF_DBG(NULL, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_ERROR,
+						 "tok_str snprintf error!!!\n");
+				return NDIS_STATUS_FAILURE;
+			}
+			RTMPAddKeyParameter(tok_str, tmpbuf, 25, final);
+		}
 	}
 #endif /* CONFIG_APSTA_MIXED_SUPPORT */
 
@@ -2398,6 +2411,40 @@ end:
 #endif /*MBSS_SUPPORT*/
 
 #ifdef APCLI_SUPPORT
+static INT multi_profile_merge_apcli_indexed(
+	UCHAR *parm,
+	UCHAR *buf1,
+	UCHAR *buf2,
+	UCHAR *final)
+{
+	UCHAR *profiles[DBDC_BAND_NUM] = {buf1, buf2};
+	CHAR src_key[32];
+	CHAR dst_key[32];
+	CHAR value[TEMP_STR_SIZE];
+	INT band, local_idx, global_idx, ret;
+
+	for (band = 0; band < DBDC_BAND_NUM; band++) {
+		for (local_idx = 0; local_idx < MAX_APCLI_NUM_PER_BAND; local_idx++) {
+			global_idx = band * MAX_APCLI_NUM_PER_BAND + local_idx;
+			ret = snprintf(src_key, sizeof(src_key), local_idx == 0 ? "%s" : "%s%d",
+					       parm, local_idx);
+			if (os_snprintf_error(sizeof(src_key), ret))
+				return NDIS_STATUS_FAILURE;
+
+			ret = snprintf(dst_key, sizeof(dst_key), global_idx == 0 ? "%s" : "%s%d",
+					       parm, global_idx);
+			if (os_snprintf_error(sizeof(dst_key), ret))
+				return NDIS_STATUS_FAILURE;
+
+			os_zero_mem(value, sizeof(value));
+			RTMPGetKeyParameter(src_key, value, sizeof(value), profiles[band], FALSE);
+			RTMPSetKeyParameter(dst_key, value, sizeof(value), final, FALSE);
+		}
+	}
+
+	return NDIS_STATUS_SUCCESS;
+}
+
 /*
 * apcli related merge function
 */
@@ -2459,34 +2506,9 @@ static INT multi_profile_merge_apcli(
 	multi_profile_merge_separate("ApCliAuthMode", buf1, buf2, final);
 	/*merge ApCliEncrypType*/
 	multi_profile_merge_separate("ApCliEncrypType", buf1, buf2, final);
-	{
-		/*merge apcli0 ApCliWPAPSK*/
-		status = RTMPGetKeyParameter("ApCliWPAPSK", tmpbuf, TEMP_STR_SIZE, buf1, TRUE);
-
-		if (status == TRUE) {
-			ret_tmp = snprintf(value, TEMP_STR_SIZE, "%s", tmpbuf);
-			if (os_snprintf_error(TEMP_STR_SIZE, ret_tmp)) {
-				MTWF_DBG(NULL, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_ERROR,
-						 "value snprintf error!!!\n");
-				ret = NDIS_STATUS_FAILURE;
-				goto end;
-			}
-			RTMPSetKeyParameter("ApCliWPAPSK", value, TEMP_STR_SIZE, final, TRUE);
-		}
-
-		/*tansfer apcli1 ApCliWPAPSK to ApCliWPAPSK1*/
-		status = RTMPGetKeyParameter("ApCliWPAPSK", tmpbuf, TEMP_STR_SIZE, buf2, TRUE);
-
-		if (status == TRUE) {
-			ret_tmp = snprintf(value, TEMP_STR_SIZE, "%s", tmpbuf);
-			if (os_snprintf_error(TEMP_STR_SIZE, ret_tmp)) {
-				MTWF_DBG(NULL, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_ERROR,
-						 "value snprintf error!!!\n");
-				ret = NDIS_STATUS_FAILURE;
-				goto end;
-			}
-			RTMPSetKeyParameter("ApCliWPAPSK1", value, TEMP_STR_SIZE, final, TRUE);
-		}
+	if (multi_profile_merge_apcli_indexed("ApCliWPAPSK", buf1, buf2, final) != NDIS_STATUS_SUCCESS) {
+		ret = NDIS_STATUS_FAILURE;
+		goto end;
 	}
 	/*merge ApCliDefaultKeyID*/
 	multi_profile_merge_separate("ApCliDefaultKeyID", buf1, buf2, final);
@@ -4146,8 +4168,8 @@ INT	multi_profile_apcli_devname_req(struct _RTMP_ADAPTER *ad, UCHAR *final_name,
 	if (!data->enable || !data->specific_dname)
 		return NDIS_STATUS_SUCCESS;
 
-	if (*ifidx == 1) {
-		/* apcli1 is 2.4G, name is apclix0*/
+	if (*ifidx >= MAX_APCLI_NUM_PER_BAND && *ifidx < MAX_APCLI_NUM_DEFAULT) {
+		/* APCLI slots after the first band's range use the second prefix. */
 		ret = snprintf(final_name, IFNAMSIZ, "%s", get_dbdcdev_name_prefix(ad, INT_APCLI));
 
 		if (os_snprintf_error(IFNAMSIZ, ret)) {

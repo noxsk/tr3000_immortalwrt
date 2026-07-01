@@ -630,7 +630,7 @@ static VOID RTMPWirelessModeCfg(RTMP_ADAPTER *pAd, RTMP_STRING *Buffer)
 			wlan_config_set_ch_band(&pAd->StaCfg[i].wdev,
 						pAd->ApCfg.MBSSID[0].wdev.PhyMode);
 #ifdef MULTI_PROFILE
-			if (is_multi_profile_enable(pAd) && i != 0) {
+			if (is_multi_profile_enable(pAd) && i >= MAX_APCLI_NUM_PER_BAND) {
 				UCHAR idx = multi_profile_get_pf1_num(pAd);
 				pAd->StaCfg[i].wdev.PhyMode = pAd->ApCfg.MBSSID[idx].wdev.PhyMode;
 				wlan_config_set_ch_band(&pAd->StaCfg[i].wdev,
@@ -1288,23 +1288,23 @@ static void rtmp_read_ap_client_from_file(
 										 mbss_wdev->PhyMode : max_2G_PhyMode;
 
 					if (default_5g_6g_rule == 1) {
-						if ((i == 0) &&
+						if ((i < MAX_APCLI_NUM_PER_BAND) &&
 							!WMODE_2G_ONLY(mbss_wdev->PhyMode) &&
 							(pApCliEntry->wdev.PhyMode ==
 							 pAd->ApCfg.MBSSID[PF_TO_BSS_IDX(pAd, mbss_idx)].wdev.PhyMode))
 							apcli_phy_mode_correct = 1;
-						else if ((i == 1) &&
+						else if ((i >= MAX_APCLI_NUM_PER_BAND) &&
 								 WMODE_2G_ONLY(mbss_wdev->PhyMode) &&
 								 (pApCliEntry->wdev.PhyMode ==
 								  pAd->ApCfg.MBSSID[PF_TO_BSS_IDX(pAd, mbss_idx)].wdev.PhyMode))
 							apcli_phy_mode_correct = 1;
 					} else {
-						if ((i == 0) &&
+						if ((i < MAX_APCLI_NUM_PER_BAND) &&
 							WMODE_2G_ONLY(mbss_wdev->PhyMode) &&
 							(pApCliEntry->wdev.PhyMode ==
 							 pAd->ApCfg.MBSSID[PF_TO_BSS_IDX(pAd, mbss_idx)].wdev.PhyMode))
 							apcli_phy_mode_correct = 1;
-						else if ((i == 1) &&
+						else if ((i >= MAX_APCLI_NUM_PER_BAND) &&
 								 !WMODE_2G_ONLY(mbss_wdev->PhyMode) &&
 								 (pApCliEntry->wdev.PhyMode ==
 								  pAd->ApCfg.MBSSID[PF_TO_BSS_IDX(pAd, mbss_idx)].wdev.PhyMode))
@@ -1314,14 +1314,14 @@ static void rtmp_read_ap_client_from_file(
 
 				if (apcli_phy_mode_correct != 1) {
 					if (default_5g_6g_rule == 1) {
-						if (i == 0)
+						if (i < MAX_APCLI_NUM_PER_BAND)
 							pApCliEntry->wdev.PhyMode = max_5G_6G_PhyMode;
-						else if (i == 1)
+						else
 							pApCliEntry->wdev.PhyMode = max_2G_PhyMode;
 					} else {
-						if (i == 0)
+						if (i < MAX_APCLI_NUM_PER_BAND)
 							pApCliEntry->wdev.PhyMode = max_2G_PhyMode;
-						else if (i == 1)
+						else
 							pApCliEntry->wdev.PhyMode = max_5G_6G_PhyMode;
 					}
 				}
@@ -1476,10 +1476,10 @@ static void rtmp_read_ap_client_from_file(
 
 #if defined(DBDC_MODE)
 	if (pAd->CommonCfg.dbdc_mode == TRUE)
-		pAd->ApCfg.ApCliNum = 2;
+		pAd->ApCfg.ApCliNum = MAX_APCLI_NUM_DEFAULT;
 	else
 #endif
-		pAd->ApCfg.ApCliNum = 1;
+		pAd->ApCfg.ApCliNum = MAX_APCLI_NUM_PER_BAND;
 
 #ifdef APCLI_CONNECTION_TRIAL
 	pAd->ApCfg.ApCliNum++;
@@ -5930,19 +5930,19 @@ NDIS_STATUS	RTMPSetProfileParameters(
 #endif /* MBSS_SUPPORT */
 
 #ifdef CONFIG_APSTA_MIXED_SUPPORT
-			if (RTMPGetKeyParameter("ApcliMacAddress", tmpbuf, 25, pBuffer, TRUE)) {
-				retval = RT_CfgSetMacAddress(pAd, tmpbuf, 0, OPMODE_STA);
+			for (i = 0; i < MAX_APCLI_NUM; i++) {
+				if (i == 0)
+					snprintf(tok_str, sizeof(tok_str), "ApcliMacAddress");
+				else
+					snprintf(tok_str, sizeof(tok_str), "ApcliMacAddress%d", i);
 
-				if (retval)
-					MTWF_DBG(pAd, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_INFO, "ApcliMacAddress = "MACSTR"\n",
-							 MAC2STR(pAd->ApcliAddr[0]));
-			}
-			if (RTMPGetKeyParameter("ApcliMacAddress1", tmpbuf, 25, pBuffer, TRUE)) {
-				retval = RT_CfgSetMacAddress(pAd, tmpbuf, 1, OPMODE_STA);
+				if (RTMPGetKeyParameter(tok_str, tmpbuf, 25, pBuffer, TRUE)) {
+					retval = RT_CfgSetMacAddress(pAd, tmpbuf, i, OPMODE_STA);
 
-				if (retval)
-					MTWF_DBG(pAd, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_INFO, "ApcliMacAddress1 = "MACSTR"\n",
-							 MAC2STR(pAd->ApcliAddr[1]));
+					if (retval)
+						MTWF_DBG(pAd, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_INFO,
+							 "%s = "MACSTR"\n", tok_str, MAC2STR(pAd->ApcliAddr[i]));
+				}
 			}
 #endif /* CONFIG_APSTA_MIXED_SUPPORT */
 

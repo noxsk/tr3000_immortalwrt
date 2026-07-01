@@ -2204,13 +2204,27 @@ return view.extend({
 			if (nameval == null || (passopt && passval == null))
 				return;
 
+			var wifi_sections = uci.sections('wireless', 'wifi-iface'),
+			    replace_radio = replopt.formvalue('_new_') == '1';
+
+			if (!replace_radio && radioDev.get('type') == 'mtwifi') {
+				var sta_count = wifi_sections.filter(function(section) {
+					return section.device == radioDev.getName() && section.mode == 'sta';
+				}).length;
+
+				if (sta_count >= 2) {
+					ui.addNotification(null, E('p',
+						_('This radio supports at most two client interfaces. Remove or edit an existing client before joining another network.')));
+					return;
+				}
+			}
+
 			var section_id = null;
 
 			return this.map.save(function() {
 				var wifi_sections = uci.sections('wireless', 'wifi-iface');
-				var hwtype = radioDev.get('type');
 
-				if (replopt.formvalue('_new_') == '1') {
+				if (replace_radio) {
 					for (var i = 0; i < wifi_sections.length; i++)
 						if (wifi_sections[i].device == radioDev.getName())
 							uci.remove('wireless', wifi_sections[i]['.name']);
@@ -2222,16 +2236,6 @@ return view.extend({
 							uci.set('wireless', wifi_sections[i]['.name'], 'disabled', '1');
 
 					uci.unset('wireless', radioDev.getName(), 'disabled');
-				}
-
-				if (hwtype == 'mtwifi')
-				{
-					for (var i = 0; i < wifi_sections.length; i++) {
-						if (wifi_sections[i].device == radioDev.getName() && wifi_sections[i].mode == "sta") {
-							section_id = wifi_sections[i][".name"];
-							uci.unset('wireless', section_id, 'disabled');
-						}
-					}
 				}
 
 				if (!section_id) {
