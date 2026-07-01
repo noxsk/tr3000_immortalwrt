@@ -1,0 +1,19 @@
+{
+	"luci-app-adguardhome": {
+		"description": "Grant access to the AdGuard Home service",
+		"read": {
+			"file": {
+				"/etc/init.d/adguardhome start": [ "exec" ],
+				"/etc/init.d/adguardhome stop": [ "exec" ],
+				"/etc/init.d/adguardhome restart": [ "exec" ]
+			},
+			"ubus": {
+				"service": [ "list" ]
+			},
+			"uci": [ "adguardhome" ]
+		},
+		"write": {
+			"uci": [ "adguardhome" ]
+		}
+	}
+}

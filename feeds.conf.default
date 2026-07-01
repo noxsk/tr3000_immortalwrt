@@ -2,3 +2,4 @@ src-git packages https://github.com/immortalwrt/packages.git;openwrt-24.10
 src-git luci https://github.com/immortalwrt/luci.git;openwrt-24.10
 src-git routing https://github.com/openwrt/routing.git;openwrt-24.10
 src-git telephony https://github.com/openwrt/telephony.git;openwrt-24.10
+src-git netspeedtest https://github.com/sirpdboy/netspeedtest.git^0c936e9dd513b2915229871b088b85ca817f5083

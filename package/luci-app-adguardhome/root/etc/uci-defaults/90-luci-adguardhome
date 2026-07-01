@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if uci -q get adguardhome.config >/dev/null; then
+	uci -q get adguardhome.config.web_port >/dev/null || \
+		uci -q set adguardhome.config.web_port='3000'
+	uci -q commit adguardhome
+fi
+
+exit 0

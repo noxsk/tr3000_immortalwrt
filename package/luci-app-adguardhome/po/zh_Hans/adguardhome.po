@@ -1,0 +1,53 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "This page controls the official AdGuard Home package. On first start, open the web interface to complete its setup."
+msgstr "此页面用于管理官方 AdGuard Home 软件包。首次启动后，请打开 Web 界面完成初始化设置。"
+
+msgid "Service status"
+msgstr "服务状态"
+
+msgid "RUNNING"
+msgstr "运行中"
+
+msgid "NOT RUNNING"
+msgstr "未运行"
+
+msgid "Service settings"
+msgstr "服务设置"
+
+msgid "Enable service"
+msgstr "启用服务"
+
+msgid "Configuration file"
+msgstr "配置文件"
+
+msgid "Working directory"
+msgstr "工作目录"
+
+msgid "PID file"
+msgstr "PID 文件"
+
+msgid "Web interface port"
+msgstr "Web 界面端口"
+
+msgid "Used only by the Open Web Interface button. The actual listening port is configured in AdGuard Home."
+msgstr "仅供“打开 Web 界面”按钮使用；实际监听端口需在 AdGuard Home 中配置。"
+
+msgid "Web interface"
+msgstr "Web 界面"
+
+msgid "Open Web Interface"
+msgstr "打开 Web 界面"
+
+msgid "Service control"
+msgstr "服务控制"
+
+msgid "Start"
+msgstr "启动"
+
+msgid "Restart"
+msgstr "重启"
+
+msgid "Stop"
+msgstr "停止"

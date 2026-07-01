@@ -55,8 +55,17 @@ make defconfig
 
 grep -qxF "$DEVICE_SYMBOL" .config
 grep -qxF 'CONFIG_PACKAGE_adguardhome=y' .config
+grep -qxF 'CONFIG_PACKAGE_luci-app-adguardhome=y' .config
 grep -qxF 'CONFIG_PACKAGE_mwan3=y' .config
 grep -qxF 'CONFIG_PACKAGE_luci-app-mwan3=y' .config
+grep -qxF 'CONFIG_PACKAGE_luci-i18n-mwan3-zh-cn=y' .config
+grep -qxF 'CONFIG_PACKAGE_firewall4=y' .config
+grep -qxF 'CONFIG_PACKAGE_iptables-nft=y' .config
+grep -qxF 'CONFIG_PACKAGE_ip6tables-nft=y' .config
+grep -qxF 'CONFIG_PACKAGE_ipset=y' .config
+grep -qxF 'CONFIG_PACKAGE_luci-app-netspeedtest=y' .config
+grep -qxF 'CONFIG_PACKAGE_homebox=y' .config
+grep -qxF 'CONFIG_PACKAGE_ookla-speedtest=y' .config
 
 make download -j"$JOBS"
 
