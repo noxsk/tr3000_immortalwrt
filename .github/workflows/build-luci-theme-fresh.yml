@@ -6,14 +6,10 @@ on:
     paths:
       - .github/workflows/build-luci-theme-fresh.yml
       - package/luci-theme-fresh/**
-      - feeds.conf.default
-      - defconfig/cudy-tr3000-v1-stock.config
   pull_request:
     paths:
       - .github/workflows/build-luci-theme-fresh.yml
       - package/luci-theme-fresh/**
-      - feeds.conf.default
-      - defconfig/cudy-tr3000-v1-stock.config
 
 permissions:
   contents: read
@@ -26,11 +22,14 @@ jobs:
   build:
     name: Compile package
     runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    timeout-minutes: 90
+
+    env:
+      SDK_BASE_URL: https://downloads.immortalwrt.org/releases/24.10-SNAPSHOT/targets/mediatek/filogic
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install build dependencies
         run: |
@@ -49,26 +48,79 @@ jobs:
             subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto \
             u-boot-tools xxd zlib1g-dev zstd
 
-      - name: Cache downloads
-        uses: actions/cache@v4
-        with:
-          path: dl
-          key: luci-theme-fresh-dl-${{ hashFiles('feeds.conf.default', 'package/luci-theme-fresh/Makefile') }}
-          restore-keys: luci-theme-fresh-dl-
-
-      - name: Update feeds
+      - name: Resolve ImmortalWrt SDK
+        id: sdk
         run: |
+          index="$(curl -fsSL "$SDK_BASE_URL/")"
+          filename="$(grep -o 'immortalwrt-sdk-[^" ]*Linux-x86_64.tar.zst' <<< "$index" | sort -u)"
+
+          if [[ -z "$filename" ]]; then
+            echo "Unable to find the mediatek/filogic SDK in $SDK_BASE_URL/." >&2
+            exit 1
+          fi
+
+          checksum="$(
+            curl -fsSL "$SDK_BASE_URL/sha256sums" |
+              awk -v file="$filename" '$2 == file || $2 == "*" file { print $1 }'
+          )"
+
+          if [[ ! "$checksum" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "Unable to resolve the checksum for $filename." >&2
+            exit 1
+          fi
+
+          echo "filename=$filename" >> "$GITHUB_OUTPUT"
+          echo "checksum=$checksum" >> "$GITHUB_OUTPUT"
+
+      - name: Cache SDK
+        uses: actions/cache@v5
+        with:
+          path: .cache/${{ steps.sdk.outputs.filename }}
+          key: luci-theme-fresh-sdk-${{ steps.sdk.outputs.checksum }}
+
+      - name: Prepare SDK
+        env:
+          SDK_FILENAME: ${{ steps.sdk.outputs.filename }}
+          SDK_CHECKSUM: ${{ steps.sdk.outputs.checksum }}
+        run: |
+          mkdir -p .cache sdk
+          archive="$GITHUB_WORKSPACE/.cache/$SDK_FILENAME"
+
+          if [[ ! -s "$archive" ]]; then
+            curl -fL --retry 3 --retry-delay 5 \
+              "$SDK_BASE_URL/$SDK_FILENAME" \
+              -o "$archive"
+          fi
+
+          echo "$SDK_CHECKSUM  $archive" | sha256sum -c -
+          tar --zstd -xf "$archive" -C sdk
+
+          sdk_dir="$(find "$GITHUB_WORKSPACE/sdk" -mindepth 1 -maxdepth 1 -type d -name 'immortalwrt-sdk-*' -print -quit)"
+          if [[ -z "$sdk_dir" ]]; then
+            echo "Unable to locate the extracted SDK directory." >&2
+            exit 1
+          fi
+
+          echo "SDK_DIR=$sdk_dir" >> "$GITHUB_ENV"
+
+      - name: Add Fresh theme and update SDK feeds
+        run: |
+          cp -a package/luci-theme-fresh "$SDK_DIR/package/"
+          cd "$SDK_DIR"
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: Configure build
+      - name: Configure SDK
         run: |
-          cp defconfig/cudy-tr3000-v1-stock.config .config
+          cd "$SDK_DIR"
+          sed -i '/CONFIG_PACKAGE_luci-theme-fresh/d' .config
+          echo 'CONFIG_PACKAGE_luci-theme-fresh=m' >> .config
           make defconfig
-          grep -qxF 'CONFIG_PACKAGE_luci-theme-fresh=y' .config
+          grep -Eq '^CONFIG_PACKAGE_luci-theme-fresh=[my]$' .config
 
       - name: Compile Fresh theme
         run: |
+          cd "$SDK_DIR"
           if ! make package/luci-theme-fresh/compile -j"$(nproc)"; then
             make package/luci-theme-fresh/compile -j1 V=s
           fi
@@ -76,7 +128,7 @@ jobs:
       - name: Collect package
         run: |
           mapfile -t packages < <(
-            find bin/packages -type f \
+            find "$SDK_DIR/bin/packages" -type f \
               \( -name 'luci-theme-fresh_*.ipk' -o -name 'luci-theme-fresh-*.apk' \) \
               -print
           )
