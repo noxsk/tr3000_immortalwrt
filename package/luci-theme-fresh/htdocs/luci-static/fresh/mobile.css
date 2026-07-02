@@ -1,0 +1,142 @@
+/* Fresh responsive refinements; Bootstrap mobile.css retains LuCI's complex
+ * table-to-card transformations for full application compatibility. */
+
+@import url("../bootstrap/mobile.css");
+
+@media screen and (max-width: 854px), screen and (max-device-width: 854px) {
+	body {
+		padding: 4px;
+	}
+
+	header {
+		margin: -4px -4px 12px;
+		padding: 4px 6px;
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+
+	header .brand {
+		display: flex !important;
+		max-width: 38%;
+		margin: 0;
+		padding: 5px 8px;
+		overflow: hidden;
+		font-size: 15px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	header .brand::before {
+		width: 17px;
+		height: 17px;
+		flex-basis: 17px;
+	}
+
+	header .nav {
+		order: 3;
+		flex: 1 0 100%;
+		gap: 2px;
+		margin: 3px 0 0;
+	}
+
+	header .nav > li {
+		flex: 1 1 auto;
+	}
+
+	header .nav a {
+		padding: 5px 7px;
+		text-align: center;
+	}
+
+	header .pull-right {
+		max-width: 55%;
+		margin-left: auto;
+	}
+
+	.nav .dropdown-menu,
+	.menu-dropdown,
+	.dropdown-menu {
+		top: 31px;
+		max-width: min(90vw, 320px);
+	}
+
+	.dropdown:hover > .dropdown-menu:not(:focus-within) {
+		left: -9999px;
+	}
+
+	.dropdown.open > .dropdown-menu,
+	.dropdown:focus-within > .dropdown-menu {
+		left: 0;
+	}
+
+	.cbi-map > .cbi-section,
+	#view > .cbi-section,
+	.cbi-tblsection {
+		padding: 11px;
+		border-radius: 8px;
+	}
+
+	.tabs,
+	.cbi-tabmenu {
+		margin-right: 0;
+		margin-left: 0;
+	}
+
+	.cbi-value label.cbi-value-title {
+		margin-bottom: 3px;
+		text-align: left;
+	}
+
+	.table .tr[data-title]::before {
+		border-color: var(--fresh-border);
+		border-radius: 6px;
+		background: var(--fresh-surface-muted) !important;
+		color: var(--fresh-text);
+	}
+
+	.actions,
+	.cbi-page-actions {
+		border: 1px solid var(--fresh-border);
+		border-radius: 8px;
+		background: var(--fresh-surface-muted);
+	}
+
+	.modal {
+		margin: max(1.25em, env(safe-area-inset-top)) auto;
+		padding: 16px;
+		border-radius: 12px;
+	}
+
+	footer {
+		padding-right: max(8px, env(safe-area-inset-right));
+		padding-left: max(8px, env(safe-area-inset-left));
+	}
+}
+
+@media screen and (max-width: 420px), screen and (max-device-width: 420px) {
+	header .brand {
+		max-width: 48%;
+	}
+
+	header .brand::before {
+		display: none;
+	}
+
+	.tabs,
+	.cbi-tabmenu {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+
+	.tabs > li,
+	.cbi-tabmenu > li {
+		max-width: none;
+		flex: 0 0 auto;
+	}
+
+	.breadcrumb {
+		border-radius: 8px;
+		flex-wrap: wrap;
+	}
+}

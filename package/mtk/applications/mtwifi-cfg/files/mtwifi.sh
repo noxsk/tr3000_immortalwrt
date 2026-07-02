@@ -55,11 +55,11 @@ detect_mtwifi() {
 					set wireless.default_${dev}.network=lan
 					set wireless.default_${dev}.mode=ap
 					set wireless.default_${dev}.ssid=${ssid}
-					set wireless.default_${dev}.encryption=none
+					set wireless.default_${dev}.encryption=sae-mixed
+					set wireless.default_${dev}.key='01234554321'
 EOF
 				uci -q commit wireless
 			}
 		done
 	fi
 }
-

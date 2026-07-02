@@ -64,6 +64,7 @@ grep -qxF 'CONFIG_PACKAGE_iptables-nft=y' .config
 grep -qxF 'CONFIG_PACKAGE_ip6tables-nft=y' .config
 grep -qxF 'CONFIG_PACKAGE_ipset=y' .config
 grep -qxF 'CONFIG_PACKAGE_luci-app-netspeedtest=y' .config
+grep -qxF 'CONFIG_PACKAGE_luci-theme-fresh=y' .config
 grep -qxF 'CONFIG_PACKAGE_homebox=y' .config
 grep -qxF 'CONFIG_PACKAGE_ookla-speedtest=y' .config
 

@@ -1,0 +1,90 @@
+{#
+ Copyright 2008-2022 LuCI contributors
+ Copyright 2026 Fresh Theme contributors
+ Licensed under the Apache License 2.0.
+-#}
+
+{%
+	import { getuid, getspnam } from 'luci.core';
+
+	const boardinfo = ubus.call('system', 'board');
+
+	http.prepare_content('text/html; charset=UTF-8');
+-%}
+
+<!DOCTYPE html>
+<html lang="{{ dispatcher.lang }}">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+		<meta name="color-scheme" content="light dark">
+		<meta name="theme-color" content="#0f766e">
+		<title>{{ striptags(`${boardinfo.hostname ?? '?'}${node ? ` - ${node.title}` : ''}`) }} - LuCI</title>
+		<script>
+			(function() {
+				var query = window.matchMedia('(prefers-color-scheme: dark)');
+				var root = document.documentElement;
+				var apply = function(event) {
+					root.setAttribute('data-darkmode', event.matches ? 'true' : 'false');
+				};
+
+				if (query.addEventListener)
+					query.addEventListener('change', apply);
+				else if (query.addListener)
+					query.addListener(apply);
+
+				apply(query);
+			})();
+		</script>
+		<link rel="stylesheet" href="{{ media }}/cascade.css">
+		<link rel="stylesheet" media="only screen and (max-width: 854px), only screen and (max-device-width: 854px)" href="{{ media }}/mobile.css">
+		<link rel="icon" href="{{ media }}/logo.svg" sizes="any" type="image/svg+xml">
+		{% if (node?.css): %}
+		<link rel="stylesheet" href="{{ resource }}/{{ node.css }}">
+		{% endif %}
+		{% if (css): %}
+		<style title="text/css">{{ css }}</style>
+		{% endif %}
+		<script src="{{ dispatcher.build_url('admin/translations', dispatcher.lang) }}"></script>
+		<script src="{{ resource }}/cbi.js"></script>
+	</head>
+
+	<body class="lang_{{ dispatcher.lang }} {{ entityencode(striptags(node?.title ?? ''), true) }}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}">
+		{% if (!blank_page): %}
+		<a class="skip-link" href="#maincontent">{{ _('Skip to content') }}</a>
+		<header>
+			<a class="brand" href="/" aria-label="{{ striptags(boardinfo.hostname ?? '?') }}">{{ striptags(boardinfo.hostname ?? '?') }}</a>
+			<ul class="nav" id="topmenu" aria-label="{{ _('Navigation') }}" style="display:none"></ul>
+			<div id="indicators" class="pull-right" aria-live="polite"></div>
+		</header>
+
+		<main id="maincontent" class="container">
+			{% if (getuid() == 0 && getspnam('root')?.pwdp === ''): %}
+				<div class="alert-message warning" role="alert">
+					<h4>{{ _('No password set!') }}</h4>
+					<p>{{ _('There is no password set on this router. Please configure a root password to protect the web interface.') }}</p>
+					{% if (dispatcher.lookup("admin/system/admin")): %}
+					  <div class="right"><a class="btn" href="{{ dispatcher.build_url("admin/system/admin") }}">{{ _('Go to password configuration...') }}</a></div>
+					{% endif %}
+				</div>
+			{% endif %}
+
+			{% if (boardinfo.rootfs_type == "initramfs"): %}
+				<div class="alert-message warning" role="alert">
+					<h4>{{ _('System running in recovery (initramfs) mode.') }}</h4>
+					<p>{{ _('No changes to settings will be stored and are lost after rebooting. This mode should only be used to install a firmware upgrade') }}</p>
+					{% if (dispatcher.lookup("admin/system/flash")): %}
+					  <div class="right"><a class="btn" href="{{ dispatcher.build_url("admin/system/flash") }}">{{ _('Go to firmware upgrade...') }}</a></div>
+					{% endif %}
+				</div>
+			{% endif %}
+
+			<noscript>
+				<div class="alert-message warning" role="alert">
+					<h4>{{ _('JavaScript required!') }}</h4>
+					<p>{{ _('You must enable JavaScript in your browser or LuCI will not work properly.') }}</p>
+				</div>
+			</noscript>
+
+			<div id="tabmenu" style="display:none"></div>
+		{% endif %}

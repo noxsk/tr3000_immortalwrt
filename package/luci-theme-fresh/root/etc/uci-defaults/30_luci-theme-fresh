@@ -1,0 +1,21 @@
+#!/bin/sh
+
+changed=0
+
+if ! uci -q get luci.themes.Fresh >/dev/null; then
+	uci set luci.themes.Fresh='/luci-static/fresh'
+	changed=1
+fi
+
+# Make Fresh the initial design for images which explicitly include it, while
+# preserving a user's choice during package upgrades.
+if [ "${PKG_UPGRADE:-0}" != 1 ]; then
+	uci set luci.main.mediaurlbase='/luci-static/fresh'
+	changed=1
+fi
+
+if [ "$changed" = 1 ]; then
+	uci commit luci
+fi
+
+exit 0
