@@ -37,7 +37,7 @@
 	--warn-color-low: #fef3c7;
 	--on-warn-color: #78350f;
 	
-	--fresh-canvas: #f8fafc;
+	--fresh-canvas: #ffffff;
 	--fresh-surface: #ffffff;
 	--fresh-surface-muted: #f1f5f9;
 	--fresh-border: #e2e8f0;
@@ -50,9 +50,9 @@
 	--fresh-shadow-small: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
 	--fresh-shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
 	
-	--fresh-radius: 12px;
-	--fresh-radius-small: 8px;
-	--fresh-radius-large: 16px;
+	--fresh-radius: 16px;
+	--fresh-radius-small: 10px;
+	--fresh-radius-large: 24px;
 	--fresh-ease: cubic-bezier(0.4, 0, 0.2, 1);
 	color-scheme: light;
 }
@@ -184,24 +184,29 @@ textarea:focus-visible,
 }
 
 header {
+	position: sticky;
+	top: 12px;
+	max-width: calc(1200px - 48px);
+	width: calc(100% - 48px);
+	margin: 12px auto 24px auto;
 	min-height: 52px;
-	margin: 0 0 24px 0;
 	padding: 0 24px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	background: rgba(255, 255, 255, 0.85);
-	border-bottom: 1px solid var(--fresh-border);
-	box-shadow: var(--fresh-shadow-small);
+	background: rgba(255, 255, 255, 0.65);
+	border: 1px solid var(--fresh-border);
+	border-radius: var(--fresh-radius-small);
+	box-shadow: var(--fresh-shadow);
 	backdrop-filter: saturate(180%) blur(16px);
 	-webkit-backdrop-filter: saturate(180%) blur(16px);
 	z-index: 100;
 }
 
 [data-darkmode="true"] header {
-	background: rgba(19, 27, 46, 0.85);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	background: rgba(19, 27, 46, 0.65);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 header a,
@@ -312,7 +317,7 @@ header ul .active > a {
 .nav .dropdown-menu li a {
 	display: block;
 	padding: 8px 12px;
-	border-radius: 6px;
+	border-radius: 8px;
 	color: var(--fresh-muted);
 	font-weight: 450;
 	font-size: 13px;
@@ -479,16 +484,21 @@ input[type="radio"] {
 
 .item::after,
 .btn,
-.cbi-button {
+.cbi-button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+button {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	height: 34px;
 	padding: 0 16px;
-	border: 1px solid var(--fresh-border-strong);
+	border: 1px solid var(--fresh-border-strong) !important;
 	border-radius: var(--fresh-radius-small);
-	background: var(--fresh-surface);
-	color: var(--fresh-text);
+	background-color: var(--fresh-surface) !important;
+	background-image: none !important;
+	color: var(--fresh-text) !important;
 	font-weight: 500;
 	font-size: 13px;
 	cursor: pointer;
@@ -498,26 +508,39 @@ input[type="radio"] {
 
 .btn:hover,
 .cbi-button:hover,
-.btn:focus,
-.cbi-button:focus {
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+button:hover {
 	border-color: var(--fresh-border-strong) !important;
-	background: var(--fresh-surface-muted);
+	background-color: var(--fresh-surface-muted) !important;
+	color: var(--fresh-text) !important;
 	box-shadow: var(--fresh-shadow-small);
 	transform: translateY(-1px);
 }
 
 .btn:active,
-.cbi-button:active {
+.cbi-button:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+input[type="reset"]:active,
+button:active {
 	transform: translateY(0);
 }
 
+/* Primary / Action Buttons (Blue bg, White text) */
 .btn.primary,
 .cbi-button-action,
 .cbi-button-apply,
 .cbi-button-reload,
-.cbi-button-edit {
+.cbi-button-edit,
+.cbi-button.important,
+.cbi-button-actionable,
+button.important,
+input[type="submit"],
+input.important {
 	border-color: var(--fresh-accent) !important;
-	background: var(--fresh-accent) !important;
+	background-color: var(--fresh-accent) !important;
 	color: #ffffff !important;
 }
 
@@ -525,17 +548,24 @@ input[type="radio"] {
 .cbi-button-action:hover,
 .cbi-button-apply:hover,
 .cbi-button-reload:hover,
-.cbi-button-edit:hover {
-	background: var(--primary-color-high) !important;
+.cbi-button-edit:hover,
+.cbi-button.important:hover,
+button.important:hover,
+input[type="submit"]:hover,
+input.important:hover {
+	border-color: var(--primary-color-high) !important;
+	background-color: var(--primary-color-high) !important;
+	color: #ffffff !important;
 	box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
 }
 
+/* Positive Buttons (Green bg, White text) */
 .cbi-button-positive,
 .cbi-button-fieldadd,
 .cbi-button-add,
 .cbi-button-save {
 	border-color: var(--success-color-medium) !important;
-	background: var(--success-color-medium) !important;
+	background-color: var(--success-color-medium) !important;
 	color: #ffffff !important;
 }
 
@@ -543,24 +573,33 @@ input[type="radio"] {
 .cbi-button-fieldadd:hover,
 .cbi-button-add:hover,
 .cbi-button-save:hover {
-	background: var(--success-color-low) !important;
+	border-color: var(--success-color-low) !important;
+	background-color: var(--success-color-low) !important;
+	color: #ffffff !important;
 	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
 }
 
+/* Negative / Danger / Reset Buttons (Red bg, White text) */
 .cbi-button-negative,
 .cbi-section-remove .cbi-button,
 .cbi-button-reset,
-.cbi-button-remove {
+.cbi-button-remove,
+.cbi-button-delete,
+input[type="reset"] {
 	border-color: var(--error-color-medium) !important;
-	background: var(--error-color-medium) !important;
+	background-color: var(--error-color-medium) !important;
 	color: #ffffff !important;
 }
 
 .cbi-button-negative:hover,
 .cbi-section-remove .cbi-button:hover,
 .cbi-button-reset:hover,
-.cbi-button-remove:hover {
-	background: var(--error-color-low) !important;
+.cbi-button-remove:hover,
+.cbi-button-delete:hover,
+input[type="reset"]:hover {
+	border-color: var(--error-color-low) !important;
+	background-color: var(--error-color-low) !important;
+	color: #ffffff !important;
 	box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
 }
 
@@ -647,7 +686,7 @@ input[type="radio"] {
 	padding: 0;
 	border: none !important;
 	background: transparent !important;
-	border-radius: 6px;
+	border-radius: 8px;
 	overflow: hidden;
 }
 
@@ -661,7 +700,7 @@ input[type="radio"] {
 	font-weight: 500;
 	font-size: 13px;
 	text-decoration: none;
-	border-radius: 6px;
+	border-radius: 8px;
 	transition: all 0.15s var(--fresh-ease);
 }
 
@@ -787,17 +826,23 @@ input[type="radio"] {
 	z-index: 1000;
 }
 
-#modal_overlay > .modal.login {
-	width: 100%;
+.modal.login {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) !important;
+	width: calc(100% - 32px);
 	max-width: 400px;
 	padding: 32px;
 	border-radius: var(--fresh-radius-large);
 	background: var(--fresh-surface);
 	box-shadow: var(--fresh-shadow-large);
 	border: 1px solid var(--fresh-border);
+	z-index: 1001;
+	animation: fresh-modal .25s var(--fresh-ease) both;
 }
 
-#modal_overlay > .modal.login h4 {
+.modal.login h4 {
 	font-size: 22px;
 	font-weight: 700;
 	margin-top: 0;
@@ -806,11 +851,11 @@ input[type="radio"] {
 	letter-spacing: -0.02em;
 }
 
-#modal_overlay > .modal.login .cbi-value {
+.modal.login .cbi-value {
 	margin-bottom: 18px;
 }
 
-#modal_overlay > .modal.login .cbi-value-title {
+.modal.login .cbi-value-title {
 	display: block;
 	width: 100%;
 	text-align: left;
@@ -818,7 +863,7 @@ input[type="radio"] {
 	font-weight: 550;
 }
 
-#modal_overlay > .modal.login button.important {
+.modal.login button.important {
 	width: 100%;
 	height: 40px;
 	border-color: var(--fresh-accent) !important;
@@ -871,18 +916,34 @@ input[type="radio"] {
 }
 
 .cbi-progressbar {
-	height: 8px;
-	border: none;
-	border-radius: 999px;
-	background: var(--fresh-surface-muted);
-	overflow: hidden;
+	height: 16px !important;
+	border: 1px solid var(--fresh-border) !important;
+	border-radius: 999px !important;
+	background: var(--fresh-surface-muted) !important;
+	position: relative !important;
+	overflow: hidden !important;
 }
 
 .cbi-progressbar > div {
-	height: 100%;
-	border-radius: 999px;
-	background: linear-gradient(90deg, var(--fresh-accent), #60a5fa);
+	height: 100% !important;
+	border-radius: 999px !important;
+	background: linear-gradient(90deg, var(--fresh-accent), #60a5fa) !important;
 	transition: width .3s var(--fresh-ease);
+}
+
+.cbi-progressbar::after {
+	content: attr(title) !important;
+	position: absolute !important;
+	top: 0 !important;
+	left: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	text-align: center !important;
+	font-size: 10px !important;
+	font-weight: 600 !important;
+	line-height: 15px !important;
+	color: var(--fresh-text) !important;
+	text-shadow: 0 0 3px var(--fresh-surface), 0 0 3px var(--fresh-surface) !important;
 }
 
 .spinning::before {

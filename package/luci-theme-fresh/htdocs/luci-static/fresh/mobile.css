@@ -9,11 +9,18 @@
 	}
 
 	header {
-		margin: 0 0 16px 0;
+		position: sticky;
+		top: 8px;
+		max-width: calc(100% - 24px);
+		width: calc(100% - 24px);
+		margin: 8px auto 16px auto;
 		padding: 8px 16px;
 		align-items: center;
 		flex-wrap: wrap;
 		min-height: auto;
+		border: 1px solid var(--fresh-border);
+		border-radius: var(--fresh-radius-small);
+		box-shadow: var(--fresh-shadow);
 	}
 
 	header .brand {
@@ -103,7 +110,7 @@
 
 	.table .tr[data-title]::before {
 		border-color: var(--fresh-border);
-		border-radius: 6px;
+		border-radius: 8px;
 		background: var(--fresh-surface-muted) !important;
 		color: var(--fresh-text);
 	}
