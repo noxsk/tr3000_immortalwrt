@@ -140,6 +140,142 @@
 	footer .pull-right {
 		margin: 0 auto;
 	}
+
+	body[data-page="admin-status-overview"] #maincontent {
+		padding: 0 12px;
+	}
+
+	body[data-page="admin-status-overview"] h2[name="content"] {
+		margin: 8px 0 18px;
+		font-size: 24px;
+	}
+
+	body[data-page="admin-status-overview"] #view {
+		display: block;
+	}
+
+	body[data-page="admin-status-overview"] #view > .cbi-section {
+		margin-bottom: 16px;
+		padding: 18px;
+		border-radius: var(--fresh-radius);
+	}
+
+	body[data-page="admin-status-overview"] #view > .cbi-section > h3:first-child {
+		margin-bottom: 14px;
+		padding-bottom: 12px;
+		font-size: 16px;
+	}
+
+	body[data-page="admin-status-overview"] .table,
+	body[data-page="admin-status-overview"] .cbi-section-table {
+		border-radius: var(--fresh-radius-small);
+	}
+
+	body[data-page="admin-status-overview"] .table .td,
+	body[data-page="admin-status-overview"] .table .th,
+	body[data-page="admin-status-overview"] .cbi-section-table .td,
+	body[data-page="admin-status-overview"] .cbi-section-table .th {
+		padding: 10px 12px;
+	}
+
+	body[data-page="admin-status-overview"] .table .td[width="33%"],
+	body[data-page="admin-status-overview"] .table .td:first-child:not(:only-child) {
+		width: auto !important;
+	}
+
+	body[data-page="admin-status-overview"] .cbi-progressbar {
+		min-width: 0;
+		height: 22px !important;
+	}
+
+	body[data-page="admin-status-overview"] .cbi-progressbar::after {
+		line-height: 21px !important;
+		font-size: 10px !important;
+	}
+
+	body[data-page="admin-status-overview"] .network-status-table {
+		display: block;
+		width: 100%;
+		margin: 0 0 12px;
+		border-spacing: 0;
+	}
+
+	body[data-page="admin-status-overview"] .network-status-table tbody,
+	body[data-page="admin-status-overview"] .network-status-table tr,
+	body[data-page="admin-status-overview"] .network-status-table td {
+		display: block;
+		width: 100% !important;
+	}
+
+	body[data-page="admin-status-overview"] .network-status-table .ifacebox,
+	body[data-page="admin-status-overview"] .ifacebox[style] {
+		display: block;
+		width: 100% !important;
+		min-width: 0 !important;
+		margin: 0 0 10px !important;
+	}
+
+	body[data-page="admin-status-overview"] .ifacebadge,
+	body[data-page="admin-status-overview"] .zonebadge {
+		max-width: 100%;
+		white-space: normal;
+	}
+
+	body[data-page="admin-status-overview"] #wifi_assoclist_table.assoclist .ifacebadge {
+		width: fit-content;
+	}
+
+	#modal_overlay {
+		align-items: flex-start;
+		padding: max(18px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
+		overflow: auto;
+	}
+
+	.modal.login {
+		position: relative;
+		top: auto;
+		left: auto;
+		transform: none !important;
+		width: min(100%, 430px);
+		max-width: none;
+		margin: 0 auto;
+		border-radius: 22px;
+	}
+
+	.modal.login h4 {
+		margin: 26px 24px 18px;
+		font-size: 22px;
+	}
+
+	.modal.login form.cbi-map {
+		padding: 0 24px;
+	}
+
+	.modal.login .cbi-section-node {
+		padding: 16px 16px 0;
+		border-radius: 18px;
+	}
+
+	.modal.login input[type="text"],
+	.modal.login input[type="password"] {
+		height: 46px;
+		font-size: 16px;
+	}
+
+	.modal.login hr {
+		margin: 22px 24px 18px;
+	}
+
+	.modal.login .alert-message.error {
+		margin-right: 24px;
+		margin-left: 24px;
+	}
+
+	.modal.login button.important {
+		width: calc(100% - 48px);
+		margin: 0 24px 28px;
+		height: 48px;
+	}
 }
 
 @media screen and (max-width: 420px), screen and (max-device-width: 420px) {
@@ -169,5 +305,59 @@
 		border-radius: var(--fresh-radius-small);
 		flex-wrap: wrap;
 		padding: 6px 12px;
+	}
+
+	body[data-page="admin-status-overview"] #view > .cbi-section {
+		padding: 14px;
+		border-radius: var(--fresh-radius-small);
+	}
+
+	body[data-page="admin-status-overview"] #view > .cbi-section > h3:first-child {
+		font-size: 15px;
+	}
+
+	body[data-page="admin-status-overview"] .ifacebadge,
+	body[data-page="admin-status-overview"] .zonebadge {
+		font-size: 11px;
+		padding-right: 7px;
+		padding-left: 7px;
+	}
+
+	.modal.login {
+		width: 100%;
+		border-radius: 20px;
+	}
+
+	.modal.login h4 {
+		margin: 22px 18px 16px;
+		font-size: 20px;
+	}
+
+	.modal.login h4::before {
+		width: 40px;
+		height: 40px;
+		border-radius: 14px;
+	}
+
+	.modal.login form.cbi-map {
+		padding: 0 18px;
+	}
+
+	.modal.login .cbi-section-node {
+		padding: 14px 14px 0;
+	}
+
+	.modal.login hr {
+		margin: 20px 18px 16px;
+	}
+
+	.modal.login .alert-message.error {
+		margin-right: 18px;
+		margin-left: 18px;
+	}
+
+	.modal.login button.important {
+		width: calc(100% - 36px);
+		margin: 0 18px 22px;
 	}
 }
