@@ -113,6 +113,7 @@ jobs:
       - name: Configure SDK
         run: |
           cd "$SDK_DIR"
+          touch .config
           sed -i '/CONFIG_PACKAGE_luci-theme-fresh/d' .config
           echo 'CONFIG_PACKAGE_luci-theme-fresh=m' >> .config
           make defconfig
