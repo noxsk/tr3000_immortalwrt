@@ -51,7 +51,22 @@ jobs:
       - name: Resolve ImmortalWrt SDK
         id: sdk
         run: |
-          index="$(curl -fsSL "$SDK_BASE_URL/")"
+          set -o pipefail
+
+          curl_flags=(
+            --fail
+            --location
+            --silent
+            --show-error
+            --http1.1
+            --retry 5
+            --retry-all-errors
+            --retry-delay 5
+            --retry-max-time 180
+            --connect-timeout 20
+          )
+
+          index="$(curl "${curl_flags[@]}" "$SDK_BASE_URL/")"
           filename="$(grep -o 'immortalwrt-sdk-[^" ]*Linux-x86_64.tar.zst' <<< "$index" | sort -u)"
 
           if [[ -z "$filename" ]]; then
@@ -60,7 +75,7 @@ jobs:
           fi
 
           checksum="$(
-            curl -fsSL "$SDK_BASE_URL/sha256sums" |
+            curl "${curl_flags[@]}" "$SDK_BASE_URL/sha256sums" |
               awk -v file="$filename" '$2 == file || $2 == "*" file { print $1 }'
           )"
 
@@ -83,13 +98,28 @@ jobs:
           SDK_FILENAME: ${{ steps.sdk.outputs.filename }}
           SDK_CHECKSUM: ${{ steps.sdk.outputs.checksum }}
         run: |
+          set -o pipefail
+
+          curl_flags=(
+            --fail
+            --location
+            --silent
+            --show-error
+            --http1.1
+            --retry 5
+            --retry-all-errors
+            --retry-delay 5
+            --retry-max-time 300
+            --connect-timeout 20
+          )
+
           mkdir -p .cache sdk
           archive="$GITHUB_WORKSPACE/.cache/$SDK_FILENAME"
 
           if [[ ! -s "$archive" ]]; then
-            curl -fL --retry 3 --retry-delay 5 \
-              "$SDK_BASE_URL/$SDK_FILENAME" \
-              -o "$archive"
+            curl "${curl_flags[@]}" \
+              --output "$archive" \
+              "$SDK_BASE_URL/$SDK_FILENAME"
           fi
 
           echo "$SDK_CHECKSUM  $archive" | sha256sum -c -
