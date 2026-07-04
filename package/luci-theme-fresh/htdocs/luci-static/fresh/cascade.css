@@ -424,8 +424,9 @@ header .nav a.menu::after {
 	width: 5px;
 	height: 5px;
 	margin-top: -2px;
-	border-right: 1.8px solid currentColor;
-	border-bottom: 1.8px solid currentColor;
+	border: none !important;
+	border-right: 1.8px solid currentColor !important;
+	border-bottom: 1.8px solid currentColor !important;
 	transform: rotate(45deg);
 	opacity: .58;
 	transition: transform .16s var(--fresh-ease), opacity .16s var(--fresh-ease);
@@ -2394,9 +2395,9 @@ body.fresh-login-page #modal_overlay {
 	border: 2px solid var(--fresh-border-strong);
 	border-top-color: var(--fresh-accent);
 	border-radius: 50%;
-	background: none;
-	mask: none;
-	-webkit-mask: none;
+	background: none !important;
+	mask: none !important;
+	-webkit-mask: none !important;
 	animation: fresh-spin .75s linear infinite;
 }
 
