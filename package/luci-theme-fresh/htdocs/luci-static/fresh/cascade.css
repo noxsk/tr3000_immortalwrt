@@ -1544,6 +1544,26 @@ input[type="reset"]:hover {
 	background: var(--fresh-surface) !important;
 }
 
+.alert-message.spinning {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 12px !important;
+	padding: 18px 22px !important;
+	border-left-width: 1px !important;
+}
+
+.alert-message.spinning::before {
+	position: static !important;
+	top: auto !important;
+	left: auto !important;
+	display: inline-block !important;
+	flex: 0 0 auto !important;
+	width: 20px !important;
+	height: 20px !important;
+	margin: 0 !important;
+}
+
 .modal {
 	border: 1px solid var(--fresh-border);
 	border-radius: var(--fresh-radius-large);
