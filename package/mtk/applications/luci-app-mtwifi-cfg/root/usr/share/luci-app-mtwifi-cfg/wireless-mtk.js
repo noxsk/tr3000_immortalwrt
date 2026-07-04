@@ -2526,7 +2526,7 @@ return view.extend({
 
 			cbi_update_table(table, [], E('em', { 'class': 'spinning' }, _('Collecting data...')))
 
-			return E([ nodes, E('h3', _('Associated Stations')), table ]);
+			return E([ nodes, E('h3', '已连接的设备'), table ]);
 		}, this, m));
 	},
 
