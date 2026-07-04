@@ -1368,8 +1368,8 @@ input[type="reset"]:hover {
 	padding: 0;
 	border: none !important;
 	background: transparent !important;
-	border-radius: 10px;
-	overflow: hidden;
+	border-radius: 0;
+	overflow: visible;
 }
 
 .tabs > li a,
