@@ -559,6 +559,13 @@ header .pull-right {
 }
 
 .fresh-theme-toggle {
+	position: fixed !important;
+	top: 16px !important;
+	right: 16px !important;
+	z-index: 2000 !important;
+	box-shadow: var(--fresh-shadow-large) !important;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -568,7 +575,6 @@ header .pull-right {
 	border-radius: 50%;
 	background: var(--fresh-accent-soft) !important;
 	color: var(--fresh-accent) !important;
-	box-shadow: none !important;
 	cursor: pointer;
 	transition: all 0.15s var(--fresh-ease);
 }
@@ -596,13 +602,8 @@ header .pull-right {
 
 @media screen and (min-width: 854px) {
 	.fresh-theme-toggle {
-		position: fixed !important;
 		top: 28px !important;
 		right: 28px !important;
-		z-index: 2000 !important;
-		box-shadow: var(--fresh-shadow-large) !important;
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
 	}
 }
 
