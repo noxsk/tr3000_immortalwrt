@@ -632,6 +632,9 @@ header [data-indicator][data-style="active"] {
 	margin: 0 auto;
 	padding: 0 24px;
 	min-height: 52vh;
+}
+
+#view > * {
 	animation: fresh-enter .32s var(--fresh-ease) both;
 }
 
@@ -785,6 +788,12 @@ select:focus,
 	align-items: stretch;
 	gap: 0;
 	max-width: 100%;
+}
+
+.control-group > .btn + .btn,
+.control-group > button + button,
+.control-group > .cbi-button + .cbi-button {
+	margin-left: 10px;
 }
 
 .control-group > input:not([type="checkbox"]):not([type="radio"]):not(:last-child),
@@ -1008,6 +1017,13 @@ input[type="radio"] {
 	cursor: pointer;
 	vertical-align: middle;
 	transition: border-color .15s var(--fresh-ease), background-color .15s var(--fresh-ease), box-shadow .15s var(--fresh-ease);
+}
+
+input[type="checkbox"]::before,
+input[type="checkbox"]::after,
+input[type="radio"]::before,
+input[type="radio"]::after {
+	content: none !important;
 }
 
 input[type="checkbox"] {
@@ -1377,6 +1393,14 @@ input[type="reset"]:hover {
 	box-shadow: none;
 }
 
+[data-tab-active="true"] {
+	opacity: 1;
+	height: auto;
+	overflow: visible;
+	transition: none !important;
+	animation: fresh-tab-enter 0.25s var(--fresh-ease) both;
+}
+
 .breadcrumb {
 	display: inline-flex;
 	align-items: center;
@@ -1487,7 +1511,7 @@ input[type="reset"]:hover {
 	background: var(--fresh-surface);
 	box-shadow: var(--fresh-shadow-large);
 	padding: 24px;
-	animation: fresh-modal .2s var(--fresh-ease) both;
+	animation: fresh-modal .22s var(--fresh-ease) both;
 }
 
 #modal_overlay {
@@ -1498,6 +1522,7 @@ input[type="reset"]:hover {
 	align-items: center;
 	justify-content: center;
 	z-index: 1000;
+	animation: fresh-fade-in .25s var(--fresh-ease) both;
 }
 
 .modal.login {
@@ -1513,7 +1538,7 @@ input[type="reset"]:hover {
 	box-shadow: var(--fresh-shadow-large);
 	border: 1px solid var(--fresh-border);
 	z-index: 1001;
-	animation: fresh-modal .25s var(--fresh-ease) both;
+	animation: fresh-modal-login .28s var(--fresh-ease) both;
 }
 
 .modal.login h4 {
@@ -1789,6 +1814,7 @@ input[type="reset"]:hover {
 
 .network-status-table .ifacebox {
 	min-width: 112px;
+	margin: 0 12px 16px 0 !important;
 	background: var(--fresh-surface-elevated);
 }
 
@@ -1982,7 +2008,7 @@ body[data-page="admin-status-overview"] .network-status-table {
 body[data-page="admin-status-overview"] .network-status-table .ifacebox,
 body[data-page="admin-status-overview"] .ifacebox[style] {
 	min-width: 118px !important;
-	margin: 0 6px 10px 0 !important;
+	margin: 0 12px 16px 0 !important;
 	border-color: var(--fresh-border-subtle);
 	background: linear-gradient(180deg, var(--fresh-surface-elevated), var(--fresh-surface));
 }
@@ -2383,11 +2409,50 @@ footer a {
 }
 
 @keyframes fresh-enter {
-	from { opacity: 0; }
-	to { opacity: 1; }
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes fresh-tab-enter {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 @keyframes fresh-modal {
+	from {
+		opacity: 0;
+		transform: scale(0.96) translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}
+
+@keyframes fresh-modal-login {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -46%) scale(0.96);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
+}
+
+@keyframes fresh-fade-in {
 	from { opacity: 0; }
 	to { opacity: 1; }
 }

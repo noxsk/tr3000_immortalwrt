@@ -245,7 +245,7 @@
 		display: block;
 		width: 100% !important;
 		min-width: 0 !important;
-		margin: 0 0 10px !important;
+		margin: 0 0 16px !important;
 	}
 
 	body[data-page="admin-status-overview"] .ifacebadge,
