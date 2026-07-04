@@ -942,6 +942,7 @@ VOID RTMPDrvClose(VOID *pAdSrc, VOID *net_dev)
 	/* clear extend bss mac address */
 	NdisZeroMemory(pAd->ExtendMBssAddr, sizeof(pAd->ExtendMBssAddr));
 	NdisZeroMemory(pAd->ApcliAddr, sizeof(pAd->ApcliAddr));
+	NdisZeroMemory(pAd->bLocalAdminApCliMAC, sizeof(pAd->bLocalAdminApCliMAC));
 
 	if (IS_HIF_TYPE(pAd, HIF_MT))
 #endif /* MT_MAC */
@@ -1556,4 +1557,3 @@ INT	Set_ErrDetectMode_Proc(
 	return TRUE;
 }
 #endif /* ERR_RECOVERY */
-

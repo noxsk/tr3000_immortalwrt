@@ -8145,6 +8145,7 @@ struct _RTMP_ADAPTER {
 	UCHAR ExtendMBssAddr[EXTEND_MBSS_MAC_MAX][MAC_ADDR_LEN]; /* User defined MAC address for MBSSID*/
 	BOOLEAN bLocalAdminExtendMBssMAC; /* Use user changed MAC */
 	UCHAR ApcliAddr[MAX_MULTI_STA][MAC_ADDR_LEN]; /* User defined MAC address for APCLI*/
+	BOOLEAN bLocalAdminApCliMAC[MAX_MULTI_STA]; /* Use user changed APCLI MAC */
 #endif
 
 	/* ------------------------------------------------------ */
@@ -15368,4 +15369,3 @@ UINT parse_short_ssid_list_ie(PEID_STRUCT pEid, UCHAR *pie);
 /*API End: for OOB Task*/
 
 #endif  /* __RTMP_H__ */
-

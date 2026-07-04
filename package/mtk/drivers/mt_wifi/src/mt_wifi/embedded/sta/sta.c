@@ -4136,6 +4136,14 @@ BOOLEAN apcli_set_random_mac_addr(
 	pAd = (RTMP_ADAPTER *)wdev->sys_handle;
 
 	if (ifIndex < MAX_APCLI_NUM) {
+#ifdef MT_MAC
+		if (pAd->bLocalAdminApCliMAC[ifIndex]) {
+			MTWF_DBG(pAd, DBG_CAT_AP, DBG_SUBCAT_ALL, DBG_LVL_INFO,
+				"PE: keep configured apcli mac addr:%02X:%02X:%02X:%02X:%02X:%02X\n",
+				MAC2STR(pAd->ApcliAddr[ifIndex]));
+			return TRUE;
+		}
+#endif
 		if (wifi_sys_close(wdev) != TRUE) {
 			MTWF_DBG(pAd, DBG_CAT_AP, DBG_SUBCAT_ALL, DBG_LVL_ERROR,
 					"PE: wifi_sys_close fail!!!\n");

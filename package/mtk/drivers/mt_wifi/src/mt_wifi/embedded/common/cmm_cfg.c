@@ -794,6 +794,7 @@ INT	RT_CfgSetMacAddress(RTMP_ADAPTER *pAd, RTMP_STRING *arg, UCHAR idx, INT opmo
 			AtoH(arg, &pAd->ApcliAddr[idx][i], 1);
 			arg = arg + 3;
 		}
+		pAd->bLocalAdminApCliMAC[idx] = TRUE;
 #endif /* CONFIG_APSTA_MIXED_SUPPORT */
 #endif /* MT_MAC */
 	} else {
@@ -12991,6 +12992,9 @@ INT set_apclimacaddress(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 			ifIndex, MAC2STR(pAd->ApcliAddr[ifIndex]));
 
 	COPY_MAC_ADDR(&pAd->StaCfg[ifIndex].wdev.if_addr, pAd->ApcliAddr[ifIndex]);
+	if (pAd->StaCfg[ifIndex].wdev.if_dev)
+		RtmpOSNetDevAddrSet(pAd->OpMode, pAd->StaCfg[ifIndex].wdev.if_dev,
+				     pAd->ApcliAddr[ifIndex], NULL);
 	return TRUE;
 }
 #endif /* IWCOMMAND_CFG80211_SUPPORT */

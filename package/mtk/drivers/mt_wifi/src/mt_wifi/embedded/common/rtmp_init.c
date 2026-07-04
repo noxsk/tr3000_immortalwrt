@@ -1068,6 +1068,10 @@ VOID UserCfgInit(RTMP_ADAPTER *pAd)
 	}
 
 	pAd->bLocalAdminMAC = FALSE;
+#ifdef MT_MAC
+	pAd->bLocalAdminExtendMBssMAC = FALSE;
+	NdisZeroMemory(pAd->bLocalAdminApCliMAC, sizeof(pAd->bLocalAdminApCliMAC));
+#endif
 	pAd->EepromAccess = FALSE;
 	pAd->Antenna.word = 0;
 #ifdef RTMP_MAC_PCI
@@ -3335,4 +3339,3 @@ VOID csi_support_deinit(RTMP_ADAPTER *pAd)
 
 }
 #endif
-
