@@ -112,14 +112,15 @@
 		margin-right: 0;
 		margin-left: 0;
 		margin-bottom: 16px;
-		padding: 3px;
-		gap: 3px;
+		padding: 0 0 8px;
+		gap: 6px;
 	}
 
 	.tabs > li a,
 	.cbi-tabmenu > li a,
 	.cbi-tabmenu > .cbi-tab-disabled a {
-		padding: 6px 12px;
+		min-height: 32px;
+		padding: 0 12px;
 		font-size: 12px;
 	}
 

@@ -874,13 +874,17 @@ input[type="reset"]:hover {
 .tabs,
 .cbi-tabmenu {
 	display: flex;
-	gap: 6px;
-	margin-bottom: 24px;
-	padding: 4px;
-	background: var(--fresh-surface-muted) !important;
-	border-radius: var(--fresh-radius-small);
-	border: 1px solid var(--fresh-border);
-	width: fit-content;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	max-width: 100%;
+	margin: 0 0 22px;
+	padding: 0 0 10px;
+	background: transparent !important;
+	border: 0;
+	border-bottom: 1px solid var(--fresh-border);
+	border-radius: 0;
+	width: 100%;
 	list-style: none;
 }
 
@@ -892,7 +896,7 @@ input[type="reset"]:hover {
 	padding: 0;
 	border: none !important;
 	background: transparent !important;
-	border-radius: 8px;
+	border-radius: 10px;
 	overflow: hidden;
 }
 
@@ -900,13 +904,19 @@ input[type="reset"]:hover {
 .cbi-tabmenu > li a,
 .cbi-tabmenu > .cbi-tab-disabled a,
 .cbi-tabmenu > .cbi-tab a {
-	display: block;
-	padding: 6px 16px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 34px;
+	padding: 0 14px;
+	border: 1px solid transparent;
 	color: var(--fresh-muted);
-	font-weight: 500;
+	font-weight: 700;
 	font-size: 13px;
+	line-height: 1;
+	white-space: nowrap;
 	text-decoration: none;
-	border-radius: 8px;
+	border-radius: 10px;
 	transition: all 0.15s var(--fresh-ease);
 }
 
@@ -925,10 +935,11 @@ input[type="reset"]:hover {
 .tabs > li.active a,
 .cbi-tabmenu > .active a,
 .cbi-tabmenu > li:not(.cbi-tab-disabled) a {
-	background: var(--fresh-surface) !important;
+	border-color: var(--fresh-info-border);
+	background: var(--fresh-accent-soft) !important;
 	color: var(--fresh-accent) !important;
-	font-weight: 600;
-	box-shadow: var(--fresh-shadow-small);
+	font-weight: 800;
+	box-shadow: none;
 }
 
 .breadcrumb {
