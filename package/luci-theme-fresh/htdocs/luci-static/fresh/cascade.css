@@ -458,8 +458,15 @@ header .nav .open > a.menu::after {
 	animation: fresh-dropdown 0.18s var(--fresh-ease) both;
 }
 
-.dropdown.open > .dropdown-menu {
+.dropdown:hover ul.dropdown-menu {
+	display: none;
+	left: 50%;
+}
+
+.dropdown.open > .dropdown-menu,
+.dropdown.open:hover > .dropdown-menu {
 	display: block;
+	left: 50%;
 }
 
 @keyframes fresh-dropdown {
