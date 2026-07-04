@@ -7,8 +7,10 @@ return view.extend({
 		var form = document.querySelector('form'),
 		    btn = document.querySelector('button');
 
+		document.body.classList.add('fresh-login-page');
+
 		var dlg = ui.showModal(
-			_('Authorization Required'),
+			_('Log in'),
 			[].slice.call(document.querySelectorAll('section > *')),
 			'login'
 		);

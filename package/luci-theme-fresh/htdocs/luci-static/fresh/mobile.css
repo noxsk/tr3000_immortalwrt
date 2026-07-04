@@ -14,49 +14,69 @@
 		max-width: calc(100% - 24px);
 		width: calc(100% - 24px);
 		margin: 8px auto 16px auto;
-		padding: 8px 16px;
+		padding: 10px;
 		align-items: center;
-		flex-wrap: wrap;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 8px 10px;
 		min-height: auto;
 		border: 1px solid var(--fresh-border);
-		border-radius: var(--fresh-radius-small);
+		border-radius: 18px;
 		box-shadow: var(--fresh-shadow);
 	}
 
 	header .brand {
 		display: flex !important;
-		max-width: 45%;
+		max-width: 100%;
 		margin: 0;
-		padding: 6px 0;
+		padding: 4px 2px;
 		font-size: 15px;
 	}
 
 	header .brand::before {
-		width: 17px;
-		height: 17px;
-		flex-basis: 17px;
+		width: 24px;
+		height: 24px;
+		flex-basis: 24px;
+		border-radius: 10px;
 	}
 
 	header .nav {
 		order: 3;
-		flex: 1 0 100%;
-		gap: 3px;
-		margin: 8px 0 0;
+		grid-column: 1 / -1;
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		gap: 4px;
+		width: 100%;
+		margin: 2px 0 0;
+		padding: 4px;
+		overflow: visible;
 	}
 
 	header .nav > li {
-		flex: 1 1 auto;
+		flex: 0 0 auto;
 	}
 
 	header .nav a {
-		padding: 6px 8px;
+		min-width: 58px;
+		height: 34px;
+		padding: 0 12px;
 		text-align: center;
 		font-size: 12px;
 	}
 
+	header #indicators,
 	header .pull-right {
-		max-width: 50%;
+		max-width: none;
+		min-width: 64px;
 		margin-left: auto;
+	}
+
+	header #indicators .btn,
+	header #indicators button,
+	header [data-indicator] {
+		height: 32px;
+		min-width: 58px;
+		padding: 0 12px;
+		font-size: 12px;
 	}
 
 	.nav .dropdown-menu,
@@ -231,20 +251,32 @@
 		overflow: auto;
 	}
 
+	body.fresh-login-page #modal_overlay {
+		align-items: center;
+		padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+	}
+
 	.modal.login {
 		position: relative;
 		top: auto;
 		left: auto;
 		transform: none !important;
-		width: min(100%, 430px);
+		width: min(100%, 390px);
 		max-width: none;
 		margin: 0 auto;
 		border-radius: 22px;
 	}
 
 	.modal.login h4 {
-		margin: 26px 24px 18px;
+		margin: 28px 24px 22px;
 		font-size: 22px;
+	}
+
+	.modal.login h4::before {
+		width: 50px;
+		height: 50px;
+		margin-bottom: 16px;
+		border-radius: 17px;
 	}
 
 	.modal.login form.cbi-map {
@@ -252,8 +284,7 @@
 	}
 
 	.modal.login .cbi-section-node {
-		padding: 16px 16px 0;
-		border-radius: 18px;
+		padding: 0;
 	}
 
 	.modal.login input[type="text"],
@@ -263,7 +294,7 @@
 	}
 
 	.modal.login hr {
-		margin: 22px 24px 18px;
+		display: none;
 	}
 
 	.modal.login .alert-message.error {
@@ -273,7 +304,7 @@
 
 	.modal.login button.important {
 		width: calc(100% - 48px);
-		margin: 0 24px 28px;
+		margin: 22px 24px 28px;
 		height: 48px;
 	}
 }
@@ -329,13 +360,13 @@
 	}
 
 	.modal.login h4 {
-		margin: 22px 18px 16px;
+		margin: 24px 18px 20px;
 		font-size: 20px;
 	}
 
 	.modal.login h4::before {
-		width: 40px;
-		height: 40px;
+		width: 46px;
+		height: 46px;
 		border-radius: 14px;
 	}
 
@@ -344,11 +375,11 @@
 	}
 
 	.modal.login .cbi-section-node {
-		padding: 14px 14px 0;
+		padding: 0;
 	}
 
 	.modal.login hr {
-		margin: 20px 18px 16px;
+		display: none;
 	}
 
 	.modal.login .alert-message.error {
@@ -358,6 +389,6 @@
 
 	.modal.login button.important {
 		width: calc(100% - 36px);
-		margin: 0 18px 22px;
+		margin: 20px 18px 24px;
 	}
 }
