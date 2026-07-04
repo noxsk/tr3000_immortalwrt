@@ -589,6 +589,18 @@ header .pull-right {
 	display: none !important;
 }
 
+@media screen and (min-width: 854px) {
+	.fresh-theme-toggle {
+		position: fixed !important;
+		top: 28px !important;
+		right: 28px !important;
+		z-index: 2000 !important;
+		box-shadow: var(--fresh-shadow-large) !important;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+}
+
 header [data-indicator],
 header .label {
 	display: inline-flex;
