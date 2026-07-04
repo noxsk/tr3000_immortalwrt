@@ -1634,8 +1634,8 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login {
-	width: calc(100% - 40px);
-	max-width: 390px;
+	width: min(calc(100vw - 40px), 460px);
+	max-width: none;
 	padding: 0;
 	border: 1px solid var(--fresh-border-subtle);
 	border-radius: 26px;
@@ -1672,7 +1672,7 @@ body.fresh-login-page #modal_overlay {
 
 .modal.login h4 {
 	position: relative;
-	margin: 32px 32px 24px;
+	margin: 38px 42px 30px;
 	font-size: 25px;
 	font-weight: 800;
 	line-height: 1.2;
@@ -1723,7 +1723,7 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login form.cbi-map {
-	padding: 0 32px;
+	padding: 0 42px;
 }
 
 .modal.login .cbi-section-node {
@@ -1734,7 +1734,9 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login .cbi-value {
-	margin: 0 0 16px;
+	display: block !important;
+	width: 100%;
+	margin: 0 0 18px;
 	padding: 0;
 	border: none;
 }
@@ -1745,7 +1747,8 @@ body.fresh-login-page #modal_overlay {
 
 .modal.login .cbi-value-title {
 	display: block;
-	width: 100%;
+	float: none !important;
+	width: auto !important;
 	margin: 0 0 7px;
 	color: var(--fresh-text);
 	font-size: 12px;
@@ -1754,12 +1757,16 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login .cbi-value-field {
-	width: 100%;
+	display: block !important;
+	width: 100% !important;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
 .modal.login input[type="text"],
 .modal.login input[type="password"] {
 	width: 100%;
+	max-width: none;
 	height: 48px;
 	padding: 0 16px;
 	border-radius: 14px;
@@ -1796,7 +1803,7 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login .alert-message.error {
-	margin: 18px 32px 0;
+	margin: 18px 42px 0;
 	padding: 12px 14px;
 	border-color: var(--fresh-error-border);
 	border-left-color: var(--error-color-high);
@@ -1806,9 +1813,9 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login button.important {
-	width: calc(100% - 64px);
+	width: calc(100% - 84px);
 	height: 50px;
-	margin: 24px 32px 32px;
+	margin: 24px 42px 38px;
 	border: none !important;
 	border-radius: 16px;
 	background: linear-gradient(135deg, var(--fresh-accent), #1d4ed8) !important;
