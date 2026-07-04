@@ -1,0 +1,10 @@
+{
+	"luci-theme-fresh-network-fix": {
+		"description": "Grant write access to network interface operations (up/down/renew)",
+		"write": {
+			"ubus": {
+				"network.interface": [ "up", "down", "renew", "status", "prepare", "dump", "add_device", "remove_device", "set_data" ]
+			}
+		}
+	}
+}
