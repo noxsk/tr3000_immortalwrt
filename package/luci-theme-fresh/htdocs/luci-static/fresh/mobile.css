@@ -281,7 +281,7 @@
 	}
 
 	.modal.login form.cbi-map {
-		padding: 0 24px;
+		padding: 0 24px 28px;
 	}
 
 	.modal.login .cbi-section-node {
@@ -304,8 +304,8 @@
 	}
 
 	.modal.login button.important {
-		width: calc(100% - 48px);
-		margin: 22px 24px 28px;
+		width: 100%;
+		margin: 22px 0 0;
 		height: 48px;
 	}
 }
@@ -372,7 +372,7 @@
 	}
 
 	.modal.login form.cbi-map {
-		padding: 0 18px;
+		padding: 0 18px 24px;
 	}
 
 	.modal.login .cbi-section-node {
@@ -389,7 +389,7 @@
 	}
 
 	.modal.login button.important {
-		width: calc(100% - 36px);
-		margin: 20px 18px 24px;
+		width: 100%;
+		margin: 20px 0 0;
 	}
 }

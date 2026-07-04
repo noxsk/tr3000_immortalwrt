@@ -1816,7 +1816,7 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login form.cbi-map {
-	padding: 0 42px;
+	padding: 0 42px 38px;
 }
 
 .modal.login .cbi-section-node {
@@ -1906,9 +1906,10 @@ body.fresh-login-page #modal_overlay {
 }
 
 .modal.login button.important {
-	width: calc(100% - 84px);
+	width: 100%;
+	box-sizing: border-box;
 	height: 50px;
-	margin: 24px 42px 38px;
+	margin: 24px 0 0;
 	border: none !important;
 	border-radius: 16px;
 	background: linear-gradient(135deg, var(--fresh-accent), #1d4ed8) !important;
@@ -1934,11 +1935,17 @@ body.fresh-login-page #modal_overlay {
 	align-items: center;
 	justify-content: center;
 	gap: 10px;
+	padding-left: 0 !important;
 	color: var(--fresh-muted);
 	font-weight: 650;
 }
 
 .modal.login .spinning::before {
+	position: static;
+	top: auto;
+	left: auto;
+	display: inline-block;
+	flex: 0 0 auto;
 	width: 18px;
 	height: 18px;
 }
