@@ -25,7 +25,11 @@ jobs:
     timeout-minutes: 90
 
     env:
-      SDK_BASE_URL: https://downloads.immortalwrt.org/releases/24.10-SNAPSHOT/targets/mediatek/filogic
+      SDK_BASE_URLS: |
+        https://mirror.nju.edu.cn/immortalwrt/releases/24.10-SNAPSHOT/targets/mediatek/filogic
+        https://mirror.sjtu.edu.cn/immortalwrt/releases/24.10-SNAPSHOT/targets/mediatek/filogic
+        https://mirrors.sjtug.sjtu.edu.cn/immortalwrt/releases/24.10-SNAPSHOT/targets/mediatek/filogic
+        https://downloads.immortalwrt.org/releases/24.10-SNAPSHOT/targets/mediatek/filogic
 
     steps:
       - name: Checkout
@@ -66,17 +70,41 @@ jobs:
             --connect-timeout 20
           )
 
-          index="$(curl "${curl_flags[@]}" "$SDK_BASE_URL/")"
+          sdk_base_urls=()
+          while IFS= read -r base_url; do
+            [[ -n "$base_url" ]] && sdk_base_urls+=("$base_url")
+          done <<< "$SDK_BASE_URLS"
+
+          fetch_text() {
+            local path="$1"
+            local base_url url content
+
+            for base_url in "${sdk_base_urls[@]}"; do
+              url="${base_url%/}/$path"
+              echo "Fetching $url" >&2
+
+              if content="$(curl "${curl_flags[@]}" "$url")"; then
+                printf '%s' "$content"
+                return 0
+              fi
+
+              echo "Failed to fetch $url" >&2
+            done
+
+            return 1
+          }
+
+          index="$(fetch_text "")"
           filename="$(grep -o 'immortalwrt-sdk-[^" ]*Linux-x86_64.tar.zst' <<< "$index" | sort -u)"
 
           if [[ -z "$filename" ]]; then
-            echo "Unable to find the mediatek/filogic SDK in $SDK_BASE_URL/." >&2
+            echo "Unable to find the mediatek/filogic SDK in configured mirrors." >&2
             exit 1
           fi
 
+          checksums="$(fetch_text "sha256sums")"
           checksum="$(
-            curl "${curl_flags[@]}" "$SDK_BASE_URL/sha256sums" |
-              awk -v file="$filename" '$2 == file || $2 == "*" file { print $1 }'
+            awk -v file="$filename" '$2 == file || $2 == "*" file { print $1 }' <<< "$checksums"
           )"
 
           if [[ ! "$checksum" =~ ^[0-9a-f]{64}$ ]]; then
@@ -113,13 +141,44 @@ jobs:
             --connect-timeout 20
           )
 
+          sdk_base_urls=()
+          while IFS= read -r base_url; do
+            [[ -n "$base_url" ]] && sdk_base_urls+=("$base_url")
+          done <<< "$SDK_BASE_URLS"
+
+          download_archive() {
+            local base_url url tmp_archive
+
+            tmp_archive="$archive.tmp"
+            rm -f "$tmp_archive"
+
+            for base_url in "${sdk_base_urls[@]}"; do
+              url="${base_url%/}/$SDK_FILENAME"
+              echo "Downloading $url" >&2
+              rm -f "$tmp_archive"
+
+              if ! curl "${curl_flags[@]}" --output "$tmp_archive" "$url"; then
+                echo "Failed to download $url" >&2
+                continue
+              fi
+
+              if echo "$SDK_CHECKSUM  $tmp_archive" | sha256sum -c -; then
+                mv "$tmp_archive" "$archive"
+                return 0
+              fi
+
+              echo "Checksum mismatch for $url" >&2
+            done
+
+            rm -f "$tmp_archive"
+            return 1
+          }
+
           mkdir -p .cache sdk
           archive="$GITHUB_WORKSPACE/.cache/$SDK_FILENAME"
 
           if [[ ! -s "$archive" ]]; then
-            curl "${curl_flags[@]}" \
-              --output "$archive" \
-              "$SDK_BASE_URL/$SDK_FILENAME"
+            download_archive
           fi
 
           echo "$SDK_CHECKSUM  $archive" | sha256sum -c -
