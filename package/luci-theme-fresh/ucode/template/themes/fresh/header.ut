@@ -123,7 +123,7 @@
 		{% if (!blank_page): %}
 		<a class="skip-link" href="#maincontent">{{ _('Skip to content') }}</a>
 		<header>
-			<a class="brand" href="/" aria-label="{{ striptags(boardinfo.hostname ?? '?') }}">{{ striptags(boardinfo.hostname ?? '?') }}</a>
+			<a class="brand" href="{{ dispatcher.build_url() }}" aria-label="{{ striptags(boardinfo.hostname ?? '?') }}">{{ striptags(boardinfo.hostname ?? '?') }}</a>
 			<ul class="nav" id="topmenu" aria-label="{{ _('Navigation') }}" style="display:none"></ul>
 			<div class="header-actions">
 				<button type="button" id="fresh-theme-toggle" class="fresh-theme-toggle" aria-label="{{ _('Switch color mode') }}">
