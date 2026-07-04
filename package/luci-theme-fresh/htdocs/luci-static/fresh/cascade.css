@@ -139,11 +139,15 @@
 }
 
 html {
+	min-height: 100%;
 	background: var(--fresh-canvas);
 	scroll-behavior: smooth;
 }
 
 body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 	background-color: var(--fresh-canvas);
 	background-image: 
 		radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.03) 0px, transparent 50%),
@@ -215,6 +219,7 @@ textarea:focus-visible,
 }
 
 header {
+	flex: 0 0 auto;
 	position: sticky;
 	top: 12px;
 	max-width: calc(1200px - 48px);
@@ -526,6 +531,8 @@ header [data-indicator][data-style="active"] {
 }
 
 #maincontent {
+	flex: 1 0 auto;
+	width: 100%;
 	max-width: 1200px;
 	margin: 0 auto;
 	padding: 0 24px;
@@ -1714,6 +1721,7 @@ body.fresh-login-page #modal_overlay {
 }
 
 footer {
+	flex: 0 0 auto;
 	max-width: 1200px;
 	margin: 32px auto 24px;
 	padding: 24px 24px 0;
