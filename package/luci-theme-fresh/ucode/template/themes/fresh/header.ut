@@ -22,18 +22,88 @@
 		<title>{{ striptags(`${boardinfo.hostname ?? '?'}${node ? ` - ${node.title}` : ''}`) }} - LuCI</title>
 		<script>
 			(function() {
+				var storageKey = 'luci-theme-fresh-mode';
 				var query = window.matchMedia('(prefers-color-scheme: dark)');
 				var root = document.documentElement;
-				var apply = function(event) {
-					root.setAttribute('data-darkmode', event.matches ? 'true' : 'false');
+				var themeMeta = null;
+
+				var normalize = function(mode) {
+					return (mode === 'light' || mode === 'dark' || mode === 'auto') ? mode : 'auto';
+				};
+
+				var storedMode = function() {
+					try {
+						return normalize(window.localStorage.getItem(storageKey));
+					}
+					catch (e) {
+						return 'auto';
+					}
+				};
+
+				var storeMode = function(mode) {
+					try {
+						if (mode === 'auto')
+							window.localStorage.removeItem(storageKey);
+						else
+							window.localStorage.setItem(storageKey, mode);
+					}
+					catch (e) {}
 				};
 
 				if (query.addEventListener)
-					query.addEventListener('change', apply);
+					query.addEventListener('change', function() {
+						if (storedMode() === 'auto')
+							window.FreshTheme.apply('auto');
+					});
 				else if (query.addListener)
-					query.addListener(apply);
+					query.addListener(function() {
+						if (storedMode() === 'auto')
+							window.FreshTheme.apply('auto');
+					});
 
-				apply(query);
+				window.FreshTheme = {
+					apply: function(mode) {
+						mode = normalize(mode || storedMode());
+
+						var dark = mode === 'dark' || (mode === 'auto' && query.matches);
+
+						root.setAttribute('data-theme-mode', mode);
+						root.setAttribute('data-darkmode', dark ? 'true' : 'false');
+						root.style.colorScheme = dark ? 'dark' : 'light';
+
+						themeMeta = themeMeta || document.querySelector('meta[name="theme-color"]');
+						if (themeMeta)
+							themeMeta.setAttribute('content', dark ? '#0f172a' : '#2563eb');
+
+						try {
+							window.dispatchEvent(new CustomEvent('fresh-theme-change', {
+								detail: { mode: mode, dark: dark }
+							}));
+						}
+						catch (e) {}
+					},
+
+					getMode: function() {
+						return normalize(root.getAttribute('data-theme-mode') || storedMode());
+					},
+
+					isDark: function() {
+						return root.getAttribute('data-darkmode') === 'true';
+					},
+
+					setMode: function(mode) {
+						mode = normalize(mode);
+						storeMode(mode);
+						this.apply(mode);
+					},
+
+					cycle: function() {
+						var mode = this.getMode();
+						this.setMode(mode === 'auto' ? 'light' : (mode === 'light' ? 'dark' : 'auto'));
+					}
+				};
+
+				window.FreshTheme.apply(storedMode());
 			})();
 		</script>
 		<link rel="stylesheet" href="{{ media }}/cascade.css">
@@ -55,7 +125,13 @@
 		<header>
 			<a class="brand" href="/" aria-label="{{ striptags(boardinfo.hostname ?? '?') }}">{{ striptags(boardinfo.hostname ?? '?') }}</a>
 			<ul class="nav" id="topmenu" aria-label="{{ _('Navigation') }}" style="display:none"></ul>
-			<div id="indicators" class="pull-right" aria-live="polite"></div>
+			<div class="header-actions">
+				<button type="button" id="fresh-theme-toggle" class="fresh-theme-toggle" aria-label="{{ _('Switch color mode') }}">
+					<span class="fresh-theme-toggle-icon" aria-hidden="true">◐</span>
+					<span class="fresh-theme-toggle-label">{{ _('Auto') }}</span>
+				</button>
+				<div id="indicators" class="pull-right" aria-live="polite"></div>
+			</div>
 		</header>
 
 		<main id="maincontent" class="container">

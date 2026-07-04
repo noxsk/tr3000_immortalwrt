@@ -12,6 +12,7 @@ return baseclass.extend({
 		let url = '';
 
 		this.renderModeMenu(tree);
+		this.bindThemeToggle();
 
 		if (L.env.dispatchpath.length >= 3) {
 			for (let i = 0; i < 3 && node; i++) {
@@ -24,6 +25,48 @@ return baseclass.extend({
 		}
 
 		this.bindDropdowns();
+	},
+
+	bindThemeToggle() {
+		const button = document.querySelector('#fresh-theme-toggle');
+		const label = button ? button.querySelector('.fresh-theme-toggle-label') : null;
+		const icon = button ? button.querySelector('.fresh-theme-toggle-icon') : null;
+
+		if (!button || !window.FreshTheme)
+			return;
+
+		const update = () => {
+			const mode = window.FreshTheme.getMode();
+			const dark = window.FreshTheme.isDark();
+			const labels = {
+				auto: _('Auto'),
+				light: _('Light'),
+				dark: _('Dark')
+			};
+			const icons = {
+				auto: dark ? '☾' : '☼',
+				light: '☼',
+				dark: '☾'
+			};
+
+			if (label)
+				label.textContent = labels[mode] || labels.auto;
+
+			if (icon)
+				icon.textContent = icons[mode] || icons.auto;
+
+			button.setAttribute('aria-pressed', mode === 'auto' ? 'false' : 'true');
+			button.setAttribute('title', _('Color mode') + ': ' + (labels[mode] || labels.auto));
+		};
+
+		button.addEventListener('click', ev => {
+			ev.preventDefault();
+			window.FreshTheme.cycle();
+			update();
+		});
+
+		window.addEventListener('fresh-theme-change', update);
+		update();
 	},
 
 	renderTabMenu(tree, url, level) {

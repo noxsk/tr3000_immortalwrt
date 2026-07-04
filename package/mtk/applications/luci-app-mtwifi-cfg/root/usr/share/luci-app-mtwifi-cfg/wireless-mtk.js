@@ -35,20 +35,32 @@ function render_radio_badge(radioDev) {
 }
 
 function render_signal_badge(signalPercent, signalValue, noiseValue, wrap, mode) {
-	var icon, title, value;
+	var icon, title, value, strength;
 
-	if (signalPercent < 0)
+	if (signalPercent < 0) {
 		icon = L.resource('icons/signal-none.svg');
-	else if (signalPercent == 0)
+		strength = 'none';
+	}
+	else if (signalPercent == 0) {
 		icon = L.resource('icons/signal-000-000.svg');
-	else if (signalPercent < 25)
+		strength = 'none';
+	}
+	else if (signalPercent < 25) {
 		icon = L.resource('icons/signal-000-025.svg');
-	else if (signalPercent < 50)
+		strength = 'weak';
+	}
+	else if (signalPercent < 50) {
 		icon = L.resource('icons/signal-025-050.svg');
-	else if (signalPercent < 75)
+		strength = 'fair';
+	}
+	else if (signalPercent < 75) {
 		icon = L.resource('icons/signal-050-075.svg');
-	else
+		strength = 'good';
+	}
+	else {
 		icon = L.resource('icons/signal-075-100.svg');
+		strength = 'strong';
+	}
 
 	if (signalValue != null && signalValue != 0) {
 		if (noiseValue != null && noiseValue != 0) {
@@ -93,7 +105,7 @@ function render_signal_badge(signalPercent, signalValue, noiseValue, wrap, mode)
 	}
 
 	return E('div', {
-		'class': wrap ? 'center' : 'ifacebadge',
+		'class': wrap ? 'center' : 'ifacebadge signal-badge signal-%s'.format(strength),
 		'data-signal': signalValue,
 		'data-noise': noiseValue
 	}, [
@@ -2053,7 +2065,7 @@ return view.extend({
 
 
 		s.handleScan = function(radioDev, ev) {
-			var table = E('table', { 'class': 'table' }, [
+			var table = E('table', { 'class': 'table wifi-scan-table' }, [
 				E('tr', { 'class': 'tr table-titles' }, [
 					E('th', { 'class': 'th col-2 middle center' }, _('Signal')),
 					E('th', { 'class': 'th col-4 middle left' }, _('SSID')),
@@ -2061,7 +2073,7 @@ return view.extend({
 					E('th', { 'class': 'th col-2 middle left hide-xs' }, _('Mode')),
 					E('th', { 'class': 'th col-3 middle left hide-xs' }, _('BSSID')),
 					E('th', { 'class': 'th col-3 middle left' }, _('Encryption')),
-					E('th', { 'class': 'th cbi-section-actions right' }, ' '),
+					E('th', { 'class': 'th cbi-section-actions wifi-scan-actions right' }, ' '),
 				])
 			]);
 
@@ -2137,8 +2149,8 @@ return view.extend({
 						E('span', { 'style': s }, '%h'.format(res.mode)),
 						E('span', { 'style': s }, '%h'.format(res.bssid)),
 						E('span', { 'style': s }, '%h'.format(network.formatWifiEncryption(res.encryption))),
-						E('div', { 'class': 'right' }, E('button', {
-							'class': 'cbi-button cbi-button-action important',
+						E('div', { 'class': 'right wifi-scan-join' }, E('button', {
+							'class': 'cbi-button cbi-button-action important wifi-scan-join-button',
 							'click': ui.createHandlerFn(this, 'handleJoin', radioDev, res)
 						}, _('Join Network')))
 					]);

@@ -97,7 +97,7 @@ return view.extend({
 		};
 
 		o = s.option(form.DummyValue, '_service_control', _('Service control'));
-		o.cfgvalue = function() {
+		o.renderWidget = function(section_id, option_index, cfgvalue) {
 			const button = function(action, title, style) {
 				return E('button', {
 					'class': 'btn cbi-button cbi-button-%s'.format(style),
@@ -111,9 +111,12 @@ return view.extend({
 
 			return E('div', {
 				'class': 'adguardhome-service-actions',
-				'style': 'display:flex; flex-wrap:wrap; align-items:center; gap:10px;'
+				'style': 'display:flex; width:100%; align-items:center; gap:10px;'
 			}, [
 				button('start', _('Start'), 'apply'),
+				E('span', {
+					'style': 'flex:1 1 auto; min-width:24px;'
+				}),
 				button('restart', _('Restart'), 'reload'),
 				button('stop', _('Stop'), 'remove')
 			]);
