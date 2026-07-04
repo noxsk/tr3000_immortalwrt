@@ -119,8 +119,8 @@
 	.tabs > li a,
 	.cbi-tabmenu > li a,
 	.cbi-tabmenu > .cbi-tab-disabled a {
-		min-height: 32px;
-		padding: 0 12px;
+		min-height: 34px;
+		padding: 0 14px;
 		font-size: 12px;
 	}
 

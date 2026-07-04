@@ -284,15 +284,18 @@ header .brand {
 	display: inline-flex;
 	align-items: center;
 	justify-self: start;
-	gap: 12px;
+	gap: 10px;
 	min-width: 0;
-	max-width: 260px;
+	max-width: 220px;
 	padding: 6px 0;
-	font-size: 18px;
-	font-weight: 760;
+	font-size: 16px;
+	font-weight: 720;
 	line-height: 1;
-	letter-spacing: -.02em;
-	transition: opacity 0.15s ease;
+	letter-spacing: -.01em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: color 0.15s ease;
 }
 
 header .brand:hover {
@@ -304,19 +307,18 @@ header .brand:hover {
 
 header .brand::before {
 	content: "";
-	width: 28px;
-	height: 28px;
-	flex: 0 0 28px;
-	border-radius: 12px;
+	width: 30px;
+	height: 30px;
+	flex: 0 0 30px;
+	border-radius: 11px;
 	background:
 		url("logo.svg") center / 18px 18px no-repeat,
 		linear-gradient(135deg, rgba(99, 102, 241, .18), rgba(37, 99, 235, .14));
-	box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .18), 0 10px 18px -14px rgba(37, 99, 235, .8);
-	transition: transform .2s var(--fresh-ease);
+	box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .18), 0 8px 14px -12px rgba(37, 99, 235, .72);
 }
 
 header .brand:hover::before {
-	transform: translateY(-1px) scale(1.04);
+	transform: none;
 }
 
 header .nav {
@@ -795,7 +797,58 @@ select[readonly] {
 
 input[type="checkbox"],
 input[type="radio"] {
+	-webkit-appearance: none;
+	appearance: none;
+	display: inline-grid;
+	place-content: center;
+	width: 18px;
+	height: 18px;
+	min-width: 18px;
+	margin: 0 6px 0 0;
+	border: 1px solid var(--fresh-border-strong) !important;
+	background-color: var(--fresh-surface) !important;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 12px 12px;
+	box-shadow: inset 0 1px 1px rgba(15, 23, 42, .04), 0 1px 2px rgba(15, 23, 42, .05);
 	accent-color: var(--fresh-accent);
+	cursor: pointer;
+	vertical-align: -4px;
+	transition: border-color .15s var(--fresh-ease), background-color .15s var(--fresh-ease), box-shadow .15s var(--fresh-ease);
+}
+
+input[type="checkbox"] {
+	border-radius: 6px;
+}
+
+input[type="radio"] {
+	border-radius: 999px;
+}
+
+input[type="checkbox"]:checked {
+	border-color: var(--fresh-accent) !important;
+	background-color: var(--fresh-accent) !important;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.25 8.15 6.35 11.25 12.75 4.75' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	box-shadow: 0 4px 10px -6px rgba(37, 99, 235, .85);
+}
+
+input[type="radio"]:checked {
+	border-color: var(--fresh-accent) !important;
+	background:
+		radial-gradient(circle, #ffffff 0 34%, transparent 38%),
+		var(--fresh-accent) !important;
+	box-shadow: 0 4px 10px -6px rgba(37, 99, 235, .85);
+}
+
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+	border-color: var(--fresh-accent) !important;
+}
+
+input[type="checkbox"]:disabled,
+input[type="radio"]:disabled {
+	cursor: not-allowed;
+	opacity: .55;
 }
 
 .item::after,
@@ -950,6 +1003,24 @@ input[type="reset"]:hover {
 	flex-wrap: wrap;
 }
 
+.table .td.cbi-section-actions,
+.cbi-section-table .td.cbi-section-actions {
+	margin: 0;
+	padding: 12px 16px;
+	border: 0;
+	border-bottom: 1px solid var(--fresh-border);
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.table .tr:last-child .td.cbi-section-actions,
+.cbi-section-table .tr:last-child .td.cbi-section-actions {
+	border-bottom: 0;
+}
+
 .table,
 .cbi-section-table {
 	width: 100%;
@@ -1035,8 +1106,8 @@ input[type="reset"]:hover {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-height: 34px;
-	padding: 0 14px;
+	min-height: 38px;
+	padding: 0 18px;
 	border: 1px solid transparent;
 	color: var(--fresh-muted);
 	font-weight: 700;
@@ -1044,7 +1115,7 @@ input[type="reset"]:hover {
 	line-height: 1;
 	white-space: nowrap;
 	text-decoration: none;
-	border-radius: 10px;
+	border-radius: 12px;
 	transition: all 0.15s var(--fresh-ease);
 }
 
