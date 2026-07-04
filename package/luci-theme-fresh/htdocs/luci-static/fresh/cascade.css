@@ -356,16 +356,14 @@ header .nav a:focus-visible {
 	background: rgba(30, 41, 59, .92);
 }
 
-header .nav .active > a,
-header ul .active > a {
+header .nav > .active > a {
 	background: #ffffff !important;
 	color: var(--fresh-accent) !important;
 	font-weight: 800;
 	box-shadow: 0 8px 18px -14px rgba(37, 99, 235, .9), inset 0 0 0 1px rgba(37, 99, 235, .08);
 }
 
-[data-darkmode="true"] header .nav .active > a,
-[data-darkmode="true"] header ul .active > a {
+[data-darkmode="true"] header .nav > .active > a {
 	background: rgba(30, 41, 59, .98) !important;
 	box-shadow: inset 0 0 0 1px rgba(96, 165, 250, .16);
 }
@@ -394,14 +392,17 @@ header .nav .open > a.menu::after {
 	left: 0;
 	z-index: 1000;
 	display: none;
-	min-width: 170px;
-	padding: 6px;
+	width: 220px;
+	max-width: calc(100vw - 32px);
+	max-height: min(70vh, 520px);
+	padding: 8px;
 	margin: 0;
 	list-style: none;
 	background: var(--fresh-surface);
 	border: 1px solid var(--fresh-border);
-	border-radius: var(--fresh-radius-small);
+	border-radius: 14px;
 	box-shadow: var(--fresh-shadow-large);
+	overflow-y: auto;
 	animation: fresh-dropdown 0.18s var(--fresh-ease) both;
 }
 
@@ -415,17 +416,31 @@ header .nav .open > a.menu::after {
 }
 
 .nav .dropdown-menu li {
-	margin: 0;
+	margin: 0 0 2px;
+}
+
+.nav .dropdown-menu li:last-child {
+	margin-bottom: 0;
 }
 
 .nav .dropdown-menu li a {
-	display: block;
-	padding: 8px 12px;
-	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 8px;
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+	height: auto;
+	min-height: 34px;
+	padding: 7px 10px;
+	border-radius: 10px;
+	background: transparent !important;
 	color: var(--fresh-muted);
-	font-weight: 450;
+	font-weight: 650;
 	font-size: 13px;
-	line-height: 1.35;
+	line-height: 1.25;
+	text-align: left;
 	text-decoration: none;
 	text-shadow: none !important;
 	-webkit-text-stroke: 0;
@@ -436,7 +451,8 @@ header .nav .open > a.menu::after {
 .nav .dropdown-menu .active a {
 	background: var(--fresh-accent-soft) !important;
 	color: var(--fresh-accent) !important;
-	font-weight: 550;
+	font-weight: 750;
+	box-shadow: none !important;
 	text-shadow: none !important;
 }
 
