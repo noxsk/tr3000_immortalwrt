@@ -10,7 +10,16 @@ fi
 # Keep dnsmasq as the DHCP server and resolver for local names,
 # but release the standard DNS port for AdGuard Home.
 if uci -q get dhcp.@dnsmasq[0] >/dev/null; then
+	lan_ip="$(uci -q get network.lan.ipaddr)"
+	[ -n "$lan_ip" ] || lan_ip='192.168.1.1'
+
 	uci -q set dhcp.@dnsmasq[0].port='54'
+
+	if uci -q get dhcp.lan >/dev/null && \
+		! uci -q show dhcp.lan.dhcp_option | grep -q "='6,"; then
+		uci -q add_list dhcp.lan.dhcp_option="6,$lan_ip"
+	fi
+
 	uci -q commit dhcp
 fi
 
