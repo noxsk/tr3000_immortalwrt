@@ -701,16 +701,6 @@ button:hover {
 	background-color: var(--fresh-surface-muted) !important;
 	color: var(--fresh-text) !important;
 	box-shadow: var(--fresh-shadow-small);
-	transform: translateY(-1px);
-}
-
-.btn:active,
-.cbi-button:active,
-input[type="button"]:active,
-input[type="submit"]:active,
-input[type="reset"]:active,
-button:active {
-	transform: translateY(0);
 }
 
 .td.right > .btn,
@@ -1700,7 +1690,6 @@ body.fresh-login-page #modal_overlay {
 .modal.login button.important:hover:not(:disabled) {
 	background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
 	box-shadow: 0 20px 32px -18px rgba(37, 99, 235, .96) !important;
-	transform: translateY(-1px);
 }
 
 .modal.login button.important:disabled {
