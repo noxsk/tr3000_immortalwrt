@@ -440,7 +440,8 @@ header .nav .open > a.menu::after {
 .nav .dropdown-menu {
 	position: absolute;
 	top: calc(100% + 4px);
-	left: 0;
+	left: 50%;
+	transform: translateX(-50%);
 	z-index: 1000;
 	display: none;
 	width: 220px;
@@ -462,8 +463,25 @@ header .nav .open > a.menu::after {
 }
 
 @keyframes fresh-dropdown {
-	from { opacity: 0; }
-	to { opacity: 1; }
+	from {
+		opacity: 0;
+		transform: translateX(-50%) translateY(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+}
+
+@keyframes fresh-dropdown-mobile {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .nav .dropdown-menu li {
@@ -531,40 +549,36 @@ header .pull-right {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 7px;
+	width: 34px;
 	height: 34px;
-	min-width: 82px;
-	padding: 0 13px;
 	border: 1px solid rgba(37, 99, 235, .16) !important;
-	border-radius: 999px;
+	border-radius: 50%;
 	background: var(--fresh-accent-soft) !important;
 	color: var(--fresh-accent) !important;
 	box-shadow: none !important;
-	font-size: 12px;
-	font-weight: 800;
-	line-height: 1;
-	white-space: nowrap;
+	cursor: pointer;
+	transition: all 0.15s var(--fresh-ease);
 }
 
 .fresh-theme-toggle:hover {
 	border-color: var(--fresh-accent) !important;
 	background: var(--fresh-accent) !important;
 	color: #ffffff !important;
-	box-shadow: 0 12px 22px -16px rgba(37, 99, 235, .86) !important;
+	box-shadow: 0 8px 16px -6px rgba(37, 99, 235, .5) !important;
 }
 
 .fresh-theme-toggle-icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 16px;
-	height: 16px;
-	font-size: 14px;
+	width: 20px;
+	height: 20px;
+	font-size: 16px;
 	line-height: 1;
 }
 
 .fresh-theme-toggle-label {
-	line-height: 1;
+	display: none !important;
 }
 
 header [data-indicator],
@@ -1900,9 +1914,7 @@ body[data-page="admin-status-overview"] #view > .spinning {
 
 @media screen and (min-width: 1180px) {
 	body[data-page="admin-status-overview"] #view {
-		display: block;
-		columns: 2 520px;
-		column-gap: 22px;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
@@ -1917,16 +1929,6 @@ body[data-page="admin-status-overview"] #view > .cbi-section {
 	overflow: hidden;
 }
 
-@media screen and (min-width: 1180px) {
-	body[data-page="admin-status-overview"] #view > .cbi-section {
-		display: inline-block;
-		width: 100%;
-		margin: 0 0 22px;
-		break-inside: avoid;
-		page-break-inside: avoid;
-		vertical-align: top;
-	}
-}
 
 body[data-page="admin-status-overview"] #view > .cbi-section > h3:first-child {
 	display: flex;
