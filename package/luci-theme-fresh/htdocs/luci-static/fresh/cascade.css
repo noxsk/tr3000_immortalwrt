@@ -196,27 +196,32 @@ body > #view {
 	place-items: center;
 }
 
-body > #view > .spinning {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 12px;
-	margin: 0;
+#view > .spinning,
+#maincontent > .spinning {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 12px !important;
+	margin: 15vh auto !important;
 	padding-left: 0 !important;
 	color: var(--fresh-text);
-	font-size: 22px;
+	font-size: 20px;
 	font-weight: 700;
 	line-height: 1.2;
+	width: 100% !important;
+	min-height: 200px;
 }
 
-body > #view > .spinning::before {
-	position: static;
-	top: auto;
-	left: auto;
-	display: inline-block;
-	flex: 0 0 auto;
-	width: 32px;
-	height: 32px;
+#view > .spinning::before,
+#maincontent > .spinning::before {
+	position: static !important;
+	top: auto !important;
+	left: auto !important;
+	display: inline-block !important;
+	flex: 0 0 auto !important;
+	width: 32px !important;
+	height: 32px !important;
+	margin: 0 !important;
 }
 
 ::selection {
