@@ -224,8 +224,8 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-	outline: 2px solid var(--fresh-accent) !important;
-	outline-offset: 2px;
+	outline: none !important;
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, .22) !important;
 }
 
 .skip-link {
@@ -296,7 +296,10 @@ header .brand {
 }
 
 header .brand:hover {
-	opacity: 0.85;
+	background: transparent !important;
+	color: var(--fresh-text) !important;
+	text-shadow: none !important;
+	opacity: 1;
 }
 
 header .brand::before {
@@ -324,11 +327,11 @@ header .nav {
 	min-width: 0;
 	max-width: 100%;
 	margin: 0;
-	padding: 4px;
+	padding: 0;
 	list-style: none;
-	border: 1px solid rgba(148, 163, 184, .16);
-	border-radius: 16px;
-	background: rgba(248, 250, 252, .72);
+	border: 0;
+	border-radius: 0;
+	background: transparent;
 	overflow: visible;
 	scrollbar-width: none;
 }
@@ -338,8 +341,7 @@ header .nav::-webkit-scrollbar {
 }
 
 [data-darkmode="true"] header .nav {
-	border-color: rgba(148, 163, 184, .12);
-	background: rgba(15, 23, 42, .36);
+	background: transparent;
 }
 
 header .nav > li {
@@ -681,6 +683,107 @@ select:focus,
 	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
 	outline: none !important;
 	background: var(--fresh-surface) !important;
+}
+
+.cbi-dropdown > ul {
+	gap: 4px;
+	min-width: 0;
+}
+
+.cbi-dropdown > .open,
+.cbi-dropdown > .more {
+	color: var(--fresh-muted);
+	text-shadow: none !important;
+}
+
+.cbi-dropdown > ul > li {
+	min-height: 24px;
+	border: 0 !important;
+	color: var(--fresh-text);
+	text-shadow: none !important;
+}
+
+.cbi-dropdown > ul > li img {
+	width: 18px;
+	height: 18px;
+	margin-right: 8px;
+	object-fit: contain;
+	flex: 0 0 auto;
+}
+
+.cbi-dropdown[open] {
+	overflow: visible;
+}
+
+.cbi-dropdown[open] > ul.dropdown {
+	top: calc(100% + 6px);
+	left: 0;
+	display: block !important;
+	width: max-content;
+	min-width: 100%;
+	max-width: min(680px, calc(100vw - 32px));
+	max-height: min(360px, calc(100vh - 180px)) !important;
+	margin: 0 !important;
+	padding: 6px !important;
+	border: 1px solid var(--fresh-border) !important;
+	border-radius: var(--fresh-radius-small) !important;
+	background: var(--fresh-surface) !important;
+	box-shadow: var(--fresh-shadow-large) !important;
+	color: var(--fresh-text) !important;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li {
+	display: flex !important;
+	align-items: center;
+	min-height: 38px;
+	margin: 0;
+	padding: 8px 10px !important;
+	border: 0 !important;
+	border-radius: 8px;
+	background: transparent !important;
+	color: var(--fresh-text) !important;
+	font-size: 13px;
+	line-height: 1.35;
+	white-space: nowrap;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li + li {
+	margin-top: 2px;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li[selected] {
+	background: var(--fresh-accent) !important;
+	color: #ffffff !important;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li.focus,
+.cbi-dropdown[open] > ul.dropdown > li:hover {
+	background: var(--fresh-accent-soft) !important;
+	color: var(--fresh-accent) !important;
+	outline: none !important;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li[selected].focus,
+.cbi-dropdown[open] > ul.dropdown > li[selected]:hover {
+	background: var(--fresh-accent) !important;
+	color: #ffffff !important;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li[unselectable] {
+	opacity: .68;
+}
+
+.cbi-dropdown[open] > ul.dropdown > li > input.create-item-input:first-child:last-child {
+	width: 100%;
+	height: 30px;
+	min-width: 0;
+	border-color: var(--fresh-border) !important;
+	border-radius: 999px;
+	background: var(--fresh-surface-inset) !important;
+	color: var(--fresh-muted);
+	text-align: center;
 }
 
 input[readonly],

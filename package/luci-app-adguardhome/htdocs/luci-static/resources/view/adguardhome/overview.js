@@ -56,8 +56,12 @@ return view.extend({
 			});
 
 			return E('div', { class: 'cbi-section' }, [
-				E('p', {}, [ E('strong', {}, _('Service status')), ': ',
-					E('span', { id: 'adguardhome_status' }, data[1] ? _('RUNNING') : _('NOT RUNNING')) ])
+				E('div', { class: 'cbi-value' }, [
+					E('label', { class: 'cbi-value-title' }, [ _('Service status'), ':' ]),
+					E('div', { class: 'cbi-value-field' }, [
+						E('span', { id: 'adguardhome_status' }, data[1] ? _('RUNNING') : _('NOT RUNNING'))
+					])
+				])
 			]);
 		};
 
@@ -92,20 +96,28 @@ return view.extend({
 			window.open('http://' + window.location.hostname + ':' + port + '/', '_blank', 'noopener');
 		};
 
-		o = s.option(form.Button, '_start', _('Service control'));
-		o.inputtitle = _('Start');
-		o.inputstyle = 'apply';
-		o.onclick = function() { return serviceAction('start'); };
+		o = s.option(form.DummyValue, '_service_control', _('Service control'));
+		o.cfgvalue = function() {
+			const button = function(action, title, style) {
+				return E('button', {
+					'class': 'btn cbi-button cbi-button-%s'.format(style),
+					'type': 'button',
+					'click': function(ev) {
+						ev.preventDefault();
+						return serviceAction(action);
+					}
+				}, title);
+			};
 
-		o = s.option(form.Button, '_restart');
-		o.inputtitle = _('Restart');
-		o.inputstyle = 'reload';
-		o.onclick = function() { return serviceAction('restart'); };
-
-		o = s.option(form.Button, '_stop');
-		o.inputtitle = _('Stop');
-		o.inputstyle = 'remove';
-		o.onclick = function() { return serviceAction('stop'); };
+			return E('div', {
+				'class': 'adguardhome-service-actions',
+				'style': 'display:flex; flex-wrap:wrap; align-items:center; gap:10px;'
+			}, [
+				button('start', _('Start'), 'apply'),
+				button('restart', _('Restart'), 'reload'),
+				button('stop', _('Stop'), 'remove')
+			]);
+		};
 
 		return m.render();
 	}
