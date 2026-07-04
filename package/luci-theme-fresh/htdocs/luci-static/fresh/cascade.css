@@ -1305,7 +1305,9 @@ body[data-page="admin-status-overview"] #view {
 
 @media screen and (min-width: 1180px) {
 	body[data-page="admin-status-overview"] #view {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		display: block;
+		columns: 2 520px;
+		column-gap: 22px;
 	}
 }
 
@@ -1318,6 +1320,17 @@ body[data-page="admin-status-overview"] #view > .cbi-section {
 	background: linear-gradient(180deg, var(--fresh-surface-elevated), var(--fresh-surface));
 	box-shadow: var(--fresh-dashboard-shadow);
 	overflow: hidden;
+}
+
+@media screen and (min-width: 1180px) {
+	body[data-page="admin-status-overview"] #view > .cbi-section {
+		display: inline-block;
+		width: 100%;
+		margin: 0 0 22px;
+		break-inside: avoid;
+		page-break-inside: avoid;
+		vertical-align: top;
+	}
 }
 
 body[data-page="admin-status-overview"] #view > .cbi-section > h3:first-child {
