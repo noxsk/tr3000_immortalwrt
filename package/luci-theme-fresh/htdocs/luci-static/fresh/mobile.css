@@ -100,11 +100,16 @@
 		animation: fresh-dropdown-mobile 0.18s var(--fresh-ease) both !important;
 	}
 
-	.dropdown:hover > .dropdown-menu:not(:focus-within) {
+	.dropdown:not(.open):hover > .dropdown-menu:not(:focus-within) {
 		left: -9999px;
 	}
 
 	.dropdown.open > .dropdown-menu,
+	.dropdown.open:hover > .dropdown-menu {
+		display: block;
+		left: 0;
+	}
+
 	.dropdown:focus-within > .dropdown-menu {
 		left: 0;
 	}

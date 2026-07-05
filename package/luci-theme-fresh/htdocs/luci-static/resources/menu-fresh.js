@@ -163,6 +163,7 @@ return baseclass.extend({
 		menus.forEach(link => {
 			link.addEventListener('click', ev => {
 				ev.preventDefault();
+				ev.stopPropagation();
 				const item = link.parentNode;
 				const open = !item.classList.contains('open');
 
