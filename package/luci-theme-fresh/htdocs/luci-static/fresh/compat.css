@@ -519,6 +519,44 @@ legend .label {
 	line-height: 1.7;
 }
 
+#applyreboot-section .alert-message {
+	margin: 0;
+	padding: 0;
+	border: 0 !important;
+	border-left: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+#applyreboot-section .spinning,
+#applyreboot-section .alert-message.spinning {
+	display: flex !important;
+	flex-direction: column;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 12px !important;
+	margin: 0;
+	padding: 0 !important;
+	color: var(--fresh-text);
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.5;
+	text-align: center;
+}
+
+#applyreboot-section .spinning::before,
+#applyreboot-section .alert-message.spinning::before {
+	position: static !important;
+	top: auto !important;
+	left: auto !important;
+	display: block !important;
+	flex: 0 0 auto !important;
+	width: 22px !important;
+	height: 22px !important;
+	margin: 0 auto !important;
+	border-width: 2px !important;
+}
+
 .alert-message.fade-in {
 	display: flex;
 	align-items: flex-start;
