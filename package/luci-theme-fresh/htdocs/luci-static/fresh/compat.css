@@ -668,6 +668,42 @@ input[type="file"] {
 	margin: 0;
 }
 
+/* Keep action-bar dropdowns aligned with light/dark form field colors. */
+.cbi-page-actions > .cbi-dropdown {
+	display: inline-flex !important;
+	align-items: center !important;
+	min-width: 120px;
+	height: 36px;
+	padding: 0 6px 0 10px !important;
+	border: 1px solid var(--fresh-border-strong) !important;
+	border-radius: var(--fresh-radius-small) !important;
+	background: var(--fresh-control-bg) !important;
+	color: var(--fresh-text) !important;
+}
+
+.cbi-page-actions > .cbi-dropdown > ul > li {
+	color: var(--fresh-text) !important;
+	text-shadow: none !important;
+}
+
+.cbi-page-actions > .cbi-dropdown > .open,
+.cbi-page-actions > .cbi-dropdown > .more {
+	color: var(--fresh-muted) !important;
+	border-left: 1px solid var(--fresh-border) !important;
+	padding-left: 8px;
+}
+
+.cbi-page-actions > .cbi-dropdown:hover {
+	border-color: var(--fresh-text) !important;
+}
+
+.cbi-page-actions > .cbi-dropdown[open],
+.cbi-page-actions > .cbi-dropdown:focus {
+	border-color: var(--fresh-accent) !important;
+	box-shadow: 0 0 0 3px var(--fresh-focus) !important;
+	background: var(--fresh-control-bg) !important;
+}
+
 .cbi-page-actions .secondary-action {
 	margin-right: auto;
 }
