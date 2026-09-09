@@ -4,7 +4,7 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_VERSION:=0.0.4
+PKG_VERSION:=0.2.2
 PKG_RELEASE:=1
 
 LUCI_TITLE:=Fresh Theme

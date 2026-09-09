@@ -18,14 +18,20 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 		<meta name="color-scheme" content="light dark">
-		<meta name="theme-color" content="#2563eb">
+		<meta name="theme-color" content="#fafafa">
 		<title>{{ striptags(`${boardinfo.hostname ?? '?'}${node ? ` - ${node.title}` : ''}`) }} - LuCI</title>
 		<script>
 			(function() {
 				var storageKey = 'luci-theme-fresh-mode';
 				var query = window.matchMedia('(prefers-color-scheme: dark)');
+				var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 				var root = document.documentElement;
 				var themeMeta = null;
+				var icons = {
+					auto: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.8a8.2 8.2 0 0 0 0 16.4Z" fill="currentColor"/></svg>',
+					light: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6.1 6.1l1.6 1.6M16.3 16.3l1.6 1.6M17.9 6.1l-1.6 1.6M7.7 16.3l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+					dark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.2 4.4a8.1 8.1 0 1 0 4.5 10.7 6.4 6.4 0 0 1-4.5-10.7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
+				};
 
 				var normalize = function(mode) {
 					return (mode === 'light' || mode === 'dark' || mode === 'auto') ? mode : 'auto';
@@ -50,37 +56,80 @@
 					catch (e) {}
 				};
 
+				var setReveal = function(origin) {
+					var x = window.innerWidth - 36;
+					var y = 36;
+
+					if (origin && typeof origin.clientX === 'number') {
+						x = origin.clientX;
+						y = origin.clientY;
+					}
+
+					root.style.setProperty('--fresh-reveal-x', x + 'px');
+					root.style.setProperty('--fresh-reveal-y', y + 'px');
+				};
+
+				var paint = function(mode) {
+					mode = normalize(mode || storedMode());
+
+					var dark = mode === 'dark' || (mode === 'auto' && query.matches);
+
+					root.setAttribute('data-theme-mode', mode);
+					root.setAttribute('data-darkmode', dark ? 'true' : 'false');
+					root.style.colorScheme = dark ? 'dark' : 'light';
+
+					themeMeta = themeMeta || document.querySelector('meta[name="theme-color"]');
+					if (themeMeta)
+						themeMeta.setAttribute('content', dark ? '#111113' : '#fafafa');
+
+					window.FreshTheme.syncToggle();
+
+					try {
+						window.dispatchEvent(new CustomEvent('fresh-theme-change', {
+							detail: { mode: mode, dark: dark }
+						}));
+					}
+					catch (e) {}
+				};
+
+				var runAnimated = function(applyFn) {
+					if (reduce.matches) {
+						applyFn();
+						return;
+					}
+
+					if (document.startViewTransition) {
+						root.classList.add('fresh-theme-reveal');
+						var transition = document.startViewTransition(applyFn);
+						var cleanup = function() { root.classList.remove('fresh-theme-reveal'); };
+						if (transition && transition.finished && transition.finished.finally)
+							transition.finished.finally(cleanup);
+						else
+							window.setTimeout(cleanup, 480);
+						return;
+					}
+
+					root.classList.add('fresh-theme-switching');
+					applyFn();
+					window.setTimeout(function() {
+						root.classList.remove('fresh-theme-switching');
+					}, 460);
+				};
+
 				if (query.addEventListener)
 					query.addEventListener('change', function() {
 						if (storedMode() === 'auto')
-							window.FreshTheme.apply('auto');
+							runAnimated(function() { paint('auto'); });
 					});
 				else if (query.addListener)
 					query.addListener(function() {
 						if (storedMode() === 'auto')
-							window.FreshTheme.apply('auto');
+							paint('auto');
 					});
 
 				window.FreshTheme = {
 					apply: function(mode) {
-						mode = normalize(mode || storedMode());
-
-						var dark = mode === 'dark' || (mode === 'auto' && query.matches);
-
-						root.setAttribute('data-theme-mode', mode);
-						root.setAttribute('data-darkmode', dark ? 'true' : 'false');
-						root.style.colorScheme = dark ? 'dark' : 'light';
-
-						themeMeta = themeMeta || document.querySelector('meta[name="theme-color"]');
-						if (themeMeta)
-							themeMeta.setAttribute('content', dark ? '#0f172a' : '#2563eb');
-
-						try {
-							window.dispatchEvent(new CustomEvent('fresh-theme-change', {
-								detail: { mode: mode, dark: dark }
-							}));
-						}
-						catch (e) {}
+						paint(mode);
 					},
 
 					getMode: function() {
@@ -91,22 +140,69 @@
 						return root.getAttribute('data-darkmode') === 'true';
 					},
 
-					setMode: function(mode) {
+					setMode: function(mode, origin) {
 						mode = normalize(mode);
 						storeMode(mode);
-						this.apply(mode);
+						setReveal(origin);
+						runAnimated(function() { paint(mode); });
 					},
 
-					cycle: function() {
+					cycle: function(origin) {
 						var mode = this.getMode();
-						this.setMode(mode === 'auto' ? 'light' : (mode === 'light' ? 'dark' : 'auto'));
+						this.setMode(mode === 'auto' ? 'light' : (mode === 'light' ? 'dark' : 'auto'), origin);
+					},
+
+					syncToggle: function() {
+						var button = document.getElementById('fresh-theme-toggle');
+						if (!button)
+							return;
+
+						var mode = this.getMode();
+						var labels = {
+							auto: '{{ _('Auto') }}',
+							light: '{{ _('Light') }}',
+							dark: '{{ _('Dark') }}'
+						};
+						var icon = button.querySelector('.fresh-theme-toggle-icon');
+						var label = button.querySelector('.fresh-theme-toggle-label');
+
+						if (icon)
+							icon.innerHTML = icons[mode] || icons.auto;
+
+						if (label)
+							label.textContent = labels[mode] || labels.auto;
+
+						button.setAttribute('data-mode', mode);
+						button.setAttribute('aria-pressed', mode === 'auto' ? 'false' : 'true');
+						button.setAttribute('aria-label', '{{ _('Color mode') }}: ' + (labels[mode] || labels.auto));
+						button.setAttribute('title', '{{ _('Color mode') }}: ' + (labels[mode] || labels.auto));
+					},
+
+					bindToggle: function() {
+						var button = document.getElementById('fresh-theme-toggle');
+						if (!button || button.getAttribute('data-bound'))
+							return;
+
+						button.setAttribute('data-bound', '1');
+						button.addEventListener('click', function(ev) {
+							ev.preventDefault();
+							window.FreshTheme.cycle(ev);
+						});
+						window.FreshTheme.syncToggle();
 					}
 				};
 
 				window.FreshTheme.apply(storedMode());
+
+				if (document.readyState === 'loading')
+					document.addEventListener('DOMContentLoaded', window.FreshTheme.bindToggle);
+				else
+					window.FreshTheme.bindToggle();
 			})();
 		</script>
 		<link rel="stylesheet" href="{{ media }}/cascade.css">
+		<link rel="stylesheet" href="{{ media }}/compat.css">
+		<link rel="stylesheet" href="{{ media }}/forms.css">
 		<link rel="stylesheet" media="only screen and (max-width: 854px), only screen and (max-device-width: 854px)" href="{{ media }}/mobile.css">
 		<link rel="icon" href="{{ media }}/logo.svg" sizes="any" type="image/svg+xml">
 		{% if (node?.css): %}
@@ -119,18 +215,24 @@
 		<script src="{{ resource }}/cbi.js"></script>
 	</head>
 
-	<body class="lang_{{ dispatcher.lang }} {{ entityencode(striptags(node?.title ?? ''), true) }}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}">
+	<body class="lang_{{ dispatcher.lang }} {{ entityencode(striptags(node?.title ?? ''), true) }}{% if (blank_page): %} fresh-login-page{% endif %}" data-page="{{ entityencode(join('-', ctx.request_path), true) }}">
+		{% if (blank_page): %}
+		<button type="button" id="fresh-theme-toggle" class="fresh-theme-toggle" data-mode="auto" aria-label="{{ _('Switch color mode') }}">
+			<span class="fresh-theme-toggle-icon" aria-hidden="true"></span>
+			<span class="fresh-theme-toggle-label">{{ _('Auto') }}</span>
+		</button>
+		{% endif %}
 		{% if (!blank_page): %}
 		<a class="skip-link" href="#maincontent">{{ _('Skip to content') }}</a>
 		<header>
 			<a class="brand" href="{{ dispatcher.build_url() }}" aria-label="{{ striptags(boardinfo.hostname ?? '?') }}">{{ striptags(boardinfo.hostname ?? '?') }}</a>
 			<ul class="nav" id="topmenu" aria-label="{{ _('Navigation') }}" style="display:none"></ul>
 			<div class="header-actions">
-				<button type="button" id="fresh-theme-toggle" class="fresh-theme-toggle" aria-label="{{ _('Switch color mode') }}">
-					<span class="fresh-theme-toggle-icon" aria-hidden="true">◐</span>
+				<div id="indicators" class="pull-right" aria-live="polite"></div>
+				<button type="button" id="fresh-theme-toggle" class="fresh-theme-toggle" data-mode="auto" aria-label="{{ _('Switch color mode') }}">
+					<span class="fresh-theme-toggle-icon" aria-hidden="true"></span>
 					<span class="fresh-theme-toggle-label">{{ _('Auto') }}</span>
 				</button>
-				<div id="indicators" class="pull-right" aria-live="polite"></div>
 			</div>
 		</header>
 

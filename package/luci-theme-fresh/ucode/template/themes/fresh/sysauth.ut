@@ -3,10 +3,15 @@
  Licensed under the Apache License 2.0.
 -#}
 
+{%
+	const boardinfo = ubus.call('system', 'board');
+%}
+
 {% include('header', { blank_page: true }) %}
 
 <section hidden>
-	<form method="post" class="cbi-map">
+	<form method="post" class="cbi-map fresh-login-form">
+		<p class="fresh-login-host">{{ striptags(boardinfo.hostname ?? '') }}</p>
 		<div class="cbi-section">
 			<div class="cbi-section-node">
 				<div class="cbi-value">

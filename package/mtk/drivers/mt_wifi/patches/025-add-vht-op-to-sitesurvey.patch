@@ -1,0 +1,50 @@
+# Upstream: padavanonly/immortalwrt-mt798x-6.6 PR #409
+# Original name: 017-add-vht-op-to-sitesurvey.patch
+# Renumbered: local 017-019 are already used.
+# Applied after 013-add-rssi-for-sitesurvey.patch
+# Local extra: enlarge LINE_LEN for the three VHT columns.
+--- a/mt_wifi/embedded/common/cmm_info.c
++++ b/mt_wifi/embedded/common/cmm_info.c
+@@ -6317,7 +6317,7 @@ RTMP_STRING *GetAuthMode(CHAR auth)
+ 			3.) UI needs to prepare at least 4096bytes to get the results
+     ==========================================================================
+ */
+-#define	LINE_LEN	(4+4+33+20+23+8+9+11+7+3+8+10+8)	/* No+Channel+SSID+Bssid+Security+RSSI+Signal+WiressMode+ExtCh+NetworkType+LEN+BcnRept+MWDSCap*/
++#define	LINE_LEN	(4+4+33+20+23+8+9+11+7+3+8+6+6+6+10+8)	/* No+Channel+SSID+Bssid+Security+RSSI+Signal+WiressMode+ExtCh+NetworkType+LEN+VHT+BcnRept+MWDSCap*/
+ #ifdef CUSTOMER_VENDOR_IE_SUPPORT
+ #ifdef CUSTOMER_MAXBITRATE_SUPPORT
+ #define	LINE_LEN	(4+4+33+20+33+9+11+7+3+10+8+8)
+@@ -6562,6 +6562,22 @@ VOID RTMPCommSiteSurveyData(
+ 		MTWF_DBG(NULL, DBG_CAT_AP, DBG_SUBCAT_ALL, DBG_LVL_ERROR, "Snprintf failed!\n");
+ 		return;
+ 	}
++	{
++		UINT8 vht_cw = 0, ccfs0 = 0, ccfs1 = 0;
++#ifdef DOT11_VHT_AC
++		if (HAS_VHT_OP_EXIST(pBss->ie_exists)) {
++			vht_cw = pBss->vht_op_ie.vht_op_info.ch_width;
++			ccfs0 = pBss->vht_op_ie.vht_op_info.ccfs_0;
++			ccfs1 = pBss->vht_op_ie.vht_op_info.ccfs_1;
++		}
++#endif /* DOT11_VHT_AC */
++		LeftBufSize = MsgLen - strlen(msg);
++		ret = snprintf(msg + strlen(msg), LeftBufSize, " %-6d%-6d%-6d", vht_cw, ccfs0, ccfs1);
++		if (os_snprintf_error(LeftBufSize, ret)) {
++			MTWF_DBG(NULL, DBG_CAT_AP, DBG_SUBCAT_ALL, DBG_LVL_ERROR, "Snprintf failed!\n");
++			return;
++		}
++	}
+ #ifdef CUSTOMER_VENDOR_IE_SUPPORT
+ #ifdef CUSTOMER_MAXBITRATE_SUPPORT
+ 	sprintf(msg + strlen(msg), " %-8lld", pBss->CustomerBssEntry.max_bit_rate);
+@@ -6731,8 +6747,9 @@ VOID RTMPIoctlGetSiteSurvey(
+ 	LeftBufSize = TotalLen - strlen(msg);
+ 
+-	Status = snprintf(msg + strlen(msg), LeftBufSize, "%-4s%-4s%-33s%-20s%-23s%-8s%-9s%-11s%-7s%-3s%-8s\n",
+-				"No", "Ch", "SSID", "BSSID", "Security", "Rssi", "Siganl(%)", "W-Mode", " ExtCH", " NT", " SSID_Len");
++	Status = snprintf(msg + strlen(msg), LeftBufSize, "%-4s%-4s%-33s%-20s%-23s%-8s%-9s%-11s%-7s%-3s%-8s %-6s%-6s%-6s\n",
++				"No", "Ch", "SSID", "BSSID", "Security", "Rssi", "Siganl(%)", "W-Mode", " ExtCH", " NT", " SSID_Len",
++				"VHT_CW", "CCFS0", "CCFS1");
+ 
+ 	if (os_snprintf_error(LeftBufSize, Status)) {
+ 		MTWF_DBG(pAdapter, DBG_CAT_CFG, DBG_SUBCAT_ALL, DBG_LVL_ERROR, "Snprintf failed!\n");

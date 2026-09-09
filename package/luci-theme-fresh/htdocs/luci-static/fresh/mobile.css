@@ -11,44 +11,46 @@
 	header {
 		position: sticky;
 		top: 8px;
-		max-width: calc(100% - 24px);
-		width: calc(100% - 24px);
-		margin: 8px auto 16px auto;
-		padding: 10px 12px;
+		max-width: calc(100% - 20px);
+		width: calc(100% - 20px);
+		margin: 8px auto 14px;
+		padding: 8px 10px;
 		align-items: center;
 		grid-template-columns: minmax(0, 1fr) auto;
 		gap: 8px 10px;
 		min-height: auto;
-		border: 1px solid var(--fresh-border);
-		border-radius: 18px;
-		box-shadow: var(--fresh-shadow);
+		border-radius: 16px;
 	}
 
 	header .brand {
 		display: flex !important;
 		max-width: 100%;
 		margin: 0;
-		padding: 4px 0 4px 2px;
-		font-size: 15px;
+		padding: 2px 0;
+		font-size: 14px;
 	}
 
 	header .brand::before {
 		width: 24px;
 		height: 24px;
 		flex-basis: 24px;
-		border-radius: 10px;
+		border-radius: 8px;
+		background-size: 24px 24px;
 	}
 
 	header .nav {
 		order: 3;
 		grid-column: 1 / -1;
 		justify-content: flex-start;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
 		gap: 4px;
 		width: 100%;
-		margin: 2px 0 0;
-		padding: 4px;
-		overflow: visible;
+		margin: 0;
+		padding: 2px 0 0;
+		overflow-x: auto;
+		overflow-y: hidden;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
 	}
 
 	header .nav > li {
@@ -56,10 +58,9 @@
 	}
 
 	header .nav a {
-		min-width: 58px;
-		height: 34px;
-		padding: 0 12px;
-		text-align: center;
+		min-width: 52px;
+		height: 32px;
+		padding: 0 10px;
 		font-size: 12px;
 	}
 
@@ -78,10 +79,10 @@
 	header #indicators .btn,
 	header #indicators button,
 	header [data-indicator] {
-		height: 32px;
-		min-width: 58px;
-		padding: 0 12px;
-		font-size: 12px;
+		height: 30px;
+		min-width: 52px;
+		padding: 0 10px;
+		font-size: 11px;
 	}
 
 	.fresh-theme-toggle {
@@ -95,7 +96,7 @@
 	.menu-dropdown,
 	.dropdown-menu {
 		top: 36px;
-		max-width: min(90vw, 320px);
+		max-width: min(92vw, 300px);
 		transform: none !important;
 		animation: fresh-dropdown-mobile 0.18s var(--fresh-ease) both !important;
 	}
@@ -115,37 +116,109 @@
 	}
 
 	#maincontent {
-		padding: 0 16px;
+		padding: 0 14px;
 	}
 
 	.cbi-map > .cbi-section,
 	#view > .cbi-section,
 	.cbi-tblsection {
 		padding: 16px;
-		border-radius: var(--fresh-radius-small);
-		margin-bottom: 16px;
+		border-radius: 12px;
+		margin-bottom: 14px;
 	}
 
 	.tabs,
 	.cbi-tabmenu {
+		flex-wrap: nowrap;
+		overflow-x: auto;
 		margin-right: 0;
 		margin-left: 0;
-		margin-bottom: 16px;
+		margin-bottom: 14px;
 		padding: 0 0 8px;
-		gap: 6px;
+		gap: 4px;
+		scrollbar-width: none;
 	}
 
 	.tabs > li a,
 	.cbi-tabmenu > li a,
 	.cbi-tabmenu > .cbi-tab-disabled a {
-		min-height: 34px;
-		padding: 0 14px;
+		min-height: 32px;
+		padding: 0 12px;
 		font-size: 12px;
 	}
 
-	.cbi-value label.cbi-value-title {
-		margin-bottom: 4px;
-		text-align: left;
+	.cbi-value {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: 6px 12px;
+	}
+
+	.cbi-value.hidden {
+		display: none !important;
+	}
+
+	.cbi-value-title,
+	label.cbi-value-title,
+	.cbi-value > label.cbi-value-title,
+	.cbi-value-field {
+		flex: 1 1 100%;
+		width: 100%;
+		max-width: 100%;
+		text-align: left !important;
+		padding-top: 0;
+	}
+
+	.cbi-value label.cbi-value-title,
+	.cbi-value > .cbi-value-title {
+		margin-bottom: 0;
+		text-align: left !important;
+	}
+
+	.cbi-value:has(> .cbi-value-field > input[type="checkbox"]):not(:has(.cbi-checkbox, .cbi-radio, select, textarea, input[type="text"], input[type="password"], input[type="number"], input[type="search"], .cbi-dropdown, .cbi-select, .cbi-dynlist)) {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+	}
+
+	.cbi-value:has(> .cbi-value-field > input[type="checkbox"]):not(:has(.cbi-checkbox, .cbi-radio, select, textarea, input[type="text"], input[type="password"], input[type="number"], input[type="search"], .cbi-dropdown, .cbi-select, .cbi-dynlist)) > .cbi-value-title,
+	.cbi-value:has(> .cbi-value-field > input[type="checkbox"]):not(:has(.cbi-checkbox, .cbi-radio, select, textarea, input[type="text"], input[type="password"], input[type="number"], input[type="search"], .cbi-dropdown, .cbi-select, .cbi-dynlist)) > label.cbi-value-title {
+		flex: none;
+		width: auto;
+		max-width: none;
+	}
+
+	.cbi-value-field,
+	.cbi-select,
+	.cbi-dynlist,
+	.cbi-dropdown:not(.btn):not(.cbi-button),
+	.cbi-input-textarea,
+	select,
+	textarea,
+	input[type="text"],
+	input[type="password"],
+	input[type="number"] {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	.table .td.cbi-dropdown-open {
+		overflow: visible;
+	}
+
+	.zone-forwards {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.cbi-filebrowser .upload {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	#applyreboot-section {
+		margin: 8vh 0 0;
+		padding: 22px 16px;
 	}
 
 	.table .tr[data-title]::before {
@@ -157,26 +230,98 @@
 
 	.actions,
 	.cbi-page-actions {
-		padding: 12px 16px;
-		border: 1px solid var(--fresh-border);
-		border-radius: var(--fresh-radius-small);
-		background: var(--fresh-surface-muted);
-		margin-top: 16px;
+		padding: 12px 14px;
+		border-radius: 12px;
+		margin-top: 14px;
 	}
 
-	.modal {
-		margin: max(1.25em, env(safe-area-inset-top)) auto;
-		padding: 20px;
-		border-radius: var(--fresh-radius);
+	#modal_overlay {
+		align-items: flex-end;
+		padding: 0;
+	}
+
+	body.modal-overlay-active #modal_overlay .modal:not(.login) {
+		width: 100%;
+		max-width: 100%;
+		max-height: min(92vh, 920px);
+		margin: 0;
+		padding: 18px 16px calc(16px + env(safe-area-inset-bottom));
+		border-radius: 18px 18px 0 0;
+		border-left: 0;
+		border-right: 0;
+		border-bottom: 0;
+		transform: none;
+	}
+
+	#modal_overlay .modal:not(.login) {
+		transform: translateY(18px);
+	}
+
+	body.fresh-login-page #modal_overlay {
+		align-items: center;
+		padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+	}
+
+	.modal.login {
+		position: relative;
+		top: auto;
+		left: auto;
+		width: min(100%, 400px);
+		max-width: none;
+		margin: 0 auto;
+		padding: 32px 22px 24px;
+		border-radius: 22px;
+	}
+
+	.modal.login::before {
+		width: 52px;
+		height: 52px;
+		margin-bottom: 16px;
+		background-size: 52px 52px;
+	}
+
+	.modal.login h4 {
+		margin: 0;
+		font-size: 26px;
+	}
+
+	.modal.login .fresh-login-host {
+		margin: 8px 0 22px;
+		font-size: 14px;
+	}
+
+	.modal.login .cbi-value-title,
+	.modal.login label.cbi-value-title {
+		font-size: 14px;
+	}
+
+	.modal.login input[type="text"],
+	.modal.login input[type="password"],
+	.modal.login button.important {
+		height: 48px;
+		font-size: 16px;
+	}
+
+	.modal.login button.important {
+		margin-top: 20px;
+	}
+
+	.modal.login .alert-message.error {
+		margin: 0 0 14px;
+		font-size: 14px;
+	}
+
+	.modal.login .fresh-login-status {
+		font-size: 15px;
 	}
 
 	footer {
 		padding: 16px 16px 24px;
 		flex-direction: column;
-		gap: 12px;
+		gap: 10px;
 		text-align: center;
 	}
-	
+
 	footer .pull-right {
 		margin: 0 auto;
 	}
@@ -186,8 +331,8 @@
 	}
 
 	body[data-page="admin-status-overview"] h2[name="content"] {
-		margin: 8px 0 18px;
-		font-size: 24px;
+		margin: 6px 0 16px;
+		font-size: 22px;
 	}
 
 	body[data-page="admin-status-overview"] #view {
@@ -195,20 +340,14 @@
 	}
 
 	body[data-page="admin-status-overview"] #view > .cbi-section {
-		margin-bottom: 16px;
-		padding: 18px;
-		border-radius: var(--fresh-radius);
+		margin-bottom: 14px;
+		padding: 16px;
 	}
 
 	body[data-page="admin-status-overview"] #view > .cbi-section > h3:first-child {
-		margin-bottom: 14px;
-		padding-bottom: 12px;
-		font-size: 16px;
-	}
-
-	body[data-page="admin-status-overview"] .table,
-	body[data-page="admin-status-overview"] .cbi-section-table {
-		border-radius: var(--fresh-radius-small);
+		margin-bottom: 12px;
+		padding-bottom: 10px;
+		font-size: 14px;
 	}
 
 	body[data-page="admin-status-overview"] .table .td,
@@ -221,16 +360,6 @@
 	body[data-page="admin-status-overview"] .table .td[width="33%"],
 	body[data-page="admin-status-overview"] .table .td:first-child:not(:only-child) {
 		width: auto !important;
-	}
-
-	body[data-page="admin-status-overview"] .cbi-progressbar {
-		min-width: 0;
-		height: 22px !important;
-	}
-
-	body[data-page="admin-status-overview"] .cbi-progressbar::after {
-		line-height: 21px !important;
-		font-size: 10px !important;
 	}
 
 	body[data-page="admin-status-overview"] .network-status-table {
@@ -252,105 +381,46 @@
 		display: block;
 		width: 100% !important;
 		min-width: 0 !important;
-		margin: 0 0 16px !important;
+		margin: 0 0 12px !important;
 	}
+}
 
-	body[data-page="admin-status-overview"] .ifacebadge,
-	body[data-page="admin-status-overview"] .zonebadge {
+@media screen and (max-width: 600px), screen and (max-device-width: 600px) {
+	.table .td.cbi-section-actions,
+	.table .th.cbi-section-actions,
+	.cbi-section-table .td.cbi-section-actions,
+	.tr > .td.cbi-section-actions {
+		display: block;
+		flex-basis: 100%;
 		max-width: 100%;
-		white-space: normal;
+		text-align: left;
+		padding: 8px 4px;
 	}
 
-	body[data-page="admin-status-overview"] #wifi_assoclist_table.assoclist .ifacebadge {
-		width: fit-content;
+	.hide-sm,
+	.hide-xs {
+		display: none !important;
 	}
 
-	#modal_overlay {
-		align-items: flex-start;
-		padding: max(18px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
-		overflow: auto;
+	[data-page="admin-network-network"] .td[data-name="_ifacebox"],
+	[data-page="admin-network-network"] .td[data-name="_ifacestat"],
+	[data-page="admin-network-wireless"] .td[data-name="_stat"] {
+		max-width: 100%;
 	}
 
-	body.fresh-login-page #modal_overlay {
-		align-items: center;
-		padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
-	}
-
-	.modal.login {
-		position: relative;
-		top: auto;
-		left: auto;
-		transform: none !important;
-		width: min(100%, 390px);
-		max-width: none;
-		margin: 0 auto;
-		border-radius: 22px;
-	}
-
-	.modal.login h4 {
-		margin: 28px 24px 22px;
-		font-size: 22px;
-	}
-
-	.modal.login h4::before {
-		width: 50px;
-		height: 50px;
-		margin-bottom: 16px;
-		border-radius: 17px;
-	}
-
-	.modal.login form.cbi-map {
-		padding: 0 24px 28px;
-	}
-
-	.modal.login .cbi-section-node {
-		padding: 0;
-	}
-
-	.modal.login input[type="text"],
-	.modal.login input[type="password"] {
-		height: 46px;
-		font-size: 16px;
-	}
-
-	.modal.login hr {
-		display: none;
-	}
-
-	.modal.login .alert-message.error {
-		margin-right: 24px;
-		margin-left: 24px;
-	}
-
-	.modal.login button.important {
+	.td .ifacebox {
 		width: 100%;
-		margin: 22px 0 0;
-		height: 48px;
+		margin: 0 0 8px !important;
 	}
 }
 
 @media screen and (max-width: 420px), screen and (max-device-width: 420px) {
 	header .brand {
-		max-width: 100%;
-	}
-
-	.fresh-theme-toggle {
-		width: 32px;
-		height: 32px;
-		min-width: 32px;
-		padding: 0;
+		max-width: 140px;
 	}
 
 	header .brand::before {
 		display: none;
-	}
-
-	.tabs,
-	.cbi-tabmenu {
-		flex-wrap: nowrap;
-		overflow-x: auto;
-		scrollbar-width: thin;
-		width: 100%;
 	}
 
 	.tabs > li,
@@ -360,62 +430,26 @@
 	}
 
 	.breadcrumb {
-		border-radius: var(--fresh-radius-small);
+		border-radius: 10px;
 		flex-wrap: wrap;
-		padding: 6px 12px;
+		padding: 6px 10px;
 	}
 
 	body[data-page="admin-status-overview"] #view > .cbi-section {
 		padding: 14px;
-		border-radius: var(--fresh-radius-small);
-	}
-
-	body[data-page="admin-status-overview"] #view > .cbi-section > h3:first-child {
-		font-size: 15px;
-	}
-
-	body[data-page="admin-status-overview"] .ifacebadge,
-	body[data-page="admin-status-overview"] .zonebadge {
-		font-size: 11px;
-		padding-right: 7px;
-		padding-left: 7px;
 	}
 
 	.modal.login {
 		width: 100%;
 		border-radius: 20px;
+		padding: 28px 18px 22px;
 	}
 
 	.modal.login h4 {
-		margin: 24px 18px 20px;
-		font-size: 20px;
+		font-size: 24px;
 	}
 
-	.modal.login h4::before {
-		width: 46px;
-		height: 46px;
-		border-radius: 14px;
-	}
-
-	.modal.login form.cbi-map {
-		padding: 0 18px 24px;
-	}
-
-	.modal.login .cbi-section-node {
-		padding: 0;
-	}
-
-	.modal.login hr {
-		display: none;
-	}
-
-	.modal.login .alert-message.error {
-		margin-right: 18px;
-		margin-left: 18px;
-	}
-
-	.modal.login button.important {
-		width: 100%;
-		margin: 20px 0 0;
+	.modal.login .fresh-login-host {
+		font-size: 14px;
 	}
 }

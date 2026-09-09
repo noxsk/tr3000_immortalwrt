@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="color-scheme" content="light dark">
+	<meta name="theme-color" content="#fafafa">
+	<title>Fresh — 主题演示</title>
+	<script>
+		(function() {
+			var storageKey = 'luci-theme-fresh-mode';
+			var query = window.matchMedia('(prefers-color-scheme: dark)');
+			var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+			var root = document.documentElement;
+			var themeMeta = null;
+			var icons = {
+				auto: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.8a8.2 8.2 0 0 0 0 16.4Z" fill="currentColor"/></svg>',
+				light: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6.1 6.1l1.6 1.6M16.3 16.3l1.6 1.6M17.9 6.1l-1.6 1.6M7.7 16.3l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+				dark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.2 4.4a8.1 8.1 0 1 0 4.5 10.7 6.4 6.4 0 0 1-4.5-10.7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
+			};
+
+			var normalize = function(mode) {
+				return (mode === 'light' || mode === 'dark' || mode === 'auto') ? mode : 'auto';
+			};
+
+			var storedMode = function() {
+				try { return normalize(window.localStorage.getItem(storageKey)); }
+				catch (e) { return 'auto'; }
+			};
+
+			var storeMode = function(mode) {
+				try {
+					if (mode === 'auto') window.localStorage.removeItem(storageKey);
+					else window.localStorage.setItem(storageKey, mode);
+				} catch (e) {}
+			};
+
+			var setReveal = function(origin) {
+				var x = window.innerWidth - 36, y = 36;
+				if (origin && typeof origin.clientX === 'number') {
+					x = origin.clientX;
+					y = origin.clientY;
+				}
+				root.style.setProperty('--fresh-reveal-x', x + 'px');
+				root.style.setProperty('--fresh-reveal-y', y + 'px');
+			};
+
+			var paint = function(mode) {
+				mode = normalize(mode || storedMode());
+				var dark = mode === 'dark' || (mode === 'auto' && query.matches);
+				root.setAttribute('data-theme-mode', mode);
+				root.setAttribute('data-darkmode', dark ? 'true' : 'false');
+				root.style.colorScheme = dark ? 'dark' : 'light';
+				themeMeta = themeMeta || document.querySelector('meta[name="theme-color"]');
+				if (themeMeta) themeMeta.setAttribute('content', dark ? '#111113' : '#fafafa');
+				window.FreshTheme.syncToggle();
+			};
+
+			var runAnimated = function(applyFn) {
+				if (reduce.matches) { applyFn(); return; }
+				if (document.startViewTransition) {
+					root.classList.add('fresh-theme-reveal');
+					document.startViewTransition(applyFn).finished.finally(function() {
+						root.classList.remove('fresh-theme-reveal');
+					});
+					return;
+				}
+				root.classList.add('fresh-theme-switching');
+				applyFn();
+				window.setTimeout(function() { root.classList.remove('fresh-theme-switching'); }, 460);
+			};
+
+			if (query.addEventListener)
+				query.addEventListener('change', function() {
+					if (storedMode() === 'auto') runAnimated(function() { paint('auto'); });
+				});
+
+			window.FreshTheme = {
+				apply: function(mode) { paint(mode); },
+				getMode: function() { return normalize(root.getAttribute('data-theme-mode') || storedMode()); },
+				isDark: function() { return root.getAttribute('data-darkmode') === 'true'; },
+				setMode: function(mode, origin) {
+					mode = normalize(mode);
+					storeMode(mode);
+					setReveal(origin);
+					runAnimated(function() { paint(mode); });
+				},
+				cycle: function(origin) {
+					var mode = this.getMode();
+					this.setMode(mode === 'auto' ? 'light' : (mode === 'light' ? 'dark' : 'auto'), origin);
+				},
+				syncToggle: function() {
+					var labels = { auto: '自动', light: '浅色', dark: '深色' };
+					document.querySelectorAll('.fresh-theme-toggle').forEach(function(button) {
+						var mode = window.FreshTheme.getMode();
+						var icon = button.querySelector('.fresh-theme-toggle-icon');
+						var label = button.querySelector('.fresh-theme-toggle-label');
+						if (icon) icon.innerHTML = icons[mode] || icons.auto;
+						if (label) label.textContent = labels[mode] || labels.auto;
+						button.setAttribute('data-mode', mode);
+						button.setAttribute('aria-pressed', mode === 'auto' ? 'false' : 'true');
+						button.setAttribute('title', '外观：' + (labels[mode] || labels.auto));
+					});
+				},
+				bindToggle: function() {
+					document.querySelectorAll('.fresh-theme-toggle').forEach(function(button) {
+						if (button.getAttribute('data-bound')) return;
+						button.setAttribute('data-bound', '1');
+						button.addEventListener('click', function(ev) {
+							ev.preventDefault();
+							window.FreshTheme.cycle(ev);
+						});
+					});
+					window.FreshTheme.syncToggle();
+				}
+			};
+
+			window.FreshTheme.apply(storedMode());
+			if (document.readyState === 'loading')
+				document.addEventListener('DOMContentLoaded', window.FreshTheme.bindToggle);
+			else
+				window.FreshTheme.bindToggle();
+		})();
+	</script>
+	<link rel="stylesheet" href="cascade.css">
+	<link rel="stylesheet" href="compat.css">
+	<link rel="stylesheet" href="forms.css">
+	<link rel="stylesheet" media="only screen and (max-width: 854px)" href="mobile.css">
+	<link rel="icon" href="logo.svg" type="image/svg+xml">
+	<style>
+		body[data-page="admin-status-overview"] #view.demo-view {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			gap: 16px;
+		}
+		@media screen and (min-width: 1180px) {
+			body[data-page="admin-status-overview"] #view.demo-view {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+		.demo-wide { grid-column: 1 / -1; }
+		.demo-hidden { display: none !important; }
+		.demo-login-stage {
+			min-height: 68vh;
+			display: grid;
+			place-items: center;
+		}
+		.demo-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-top: 4px;
+		}
+		.demo-iface-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+		}
+		.demo-iface-row .ifacebox {
+			flex: 1 1 150px;
+			min-width: 140px;
+			margin: 0 !important;
+		}
+		#demo-login-splash {
+			position: fixed;
+			inset: 0;
+			z-index: 1050;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			gap: 12px;
+			margin: 0 !important;
+			min-height: 0 !important;
+			color: var(--fresh-muted);
+			font-size: 15px;
+			font-weight: 550;
+			background: var(--fresh-canvas);
+		}
+		body.fresh-login-page #demo-login-splash:not(.demo-hidden) {
+			display: flex !important;
+		}
+		body.fresh-login-ready #demo-login-splash {
+			display: none !important;
+		}
+		body.fresh-login-page header {
+			background: transparent;
+			border-color: transparent;
+			box-shadow: none;
+			backdrop-filter: none;
+		}
+		body.fresh-login-page header .brand,
+		body.fresh-login-page header .nav,
+		body.fresh-login-page header #indicators,
+		body.fresh-login-page main,
+		body.fresh-login-page footer {
+			display: none;
+		}
+	</style>
+</head>
+<body data-page="admin-status-overview">
+	<a class="skip-link" href="#maincontent">跳到内容</a>
+	<header>
+		<a class="brand" href="#overview">OpenWrt</a>
+		<ul class="nav" id="topmenu" aria-label="导航">
+			<li class="active"><a href="#overview" data-nav="overview" aria-current="page">状态</a></li>
+			<li class="dropdown">
+				<a class="menu" href="#system" data-nav="system" aria-haspopup="true" aria-expanded="false">系统</a>
+				<ul class="dropdown-menu">
+					<li class="active"><a href="#system">系统属性</a></li>
+					<li><a href="#system">软件包</a></li>
+					<li><a href="#system">备份 / 升级</a></li>
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a class="menu" href="#network" data-nav="network" aria-haspopup="true" aria-expanded="false">网络</a>
+				<ul class="dropdown-menu">
+					<li><a href="#network">接口</a></li>
+					<li><a href="#network">无线</a></li>
+					<li><a href="#network">防火墙</a></li>
+				</ul>
+			</li>
+			<li><a href="#services" data-nav="services">服务</a></li>
+		</ul>
+		<div class="header-actions">
+			<div id="indicators" class="pull-right">
+				<span data-indicator="xfer" data-style="active">已连接</span>
+			</div>
+			<button type="button" class="fresh-theme-toggle" data-mode="auto" aria-label="切换外观">
+				<span class="fresh-theme-toggle-icon" aria-hidden="true"></span>
+				<span class="fresh-theme-toggle-label">自动</span>
+			</button>
+		</div>
+	</header>
+
+	<main id="maincontent" class="container">
+		<div id="panel-overview">
+			<h2 name="content">状态</h2>
+			<ul class="tabs" aria-label="页面导航">
+				<li class="active"><a href="#overview" aria-current="page">概览</a></li>
+				<li><a href="#system">系统</a></li>
+				<li><a href="#network">防火墙</a></li>
+			</ul>
+
+			<div class="alert-message warning" role="alert">
+				<h4>尚未设置密码</h4>
+				<p>请尽快为路由器设置管理员密码，以保护 Web 界面。</p>
+				<div class="right"><button type="button" class="btn" data-open="modal-password">前往设置</button></div>
+			</div>
+
+			<div id="view" class="demo-view">
+				<section class="cbi-section">
+					<h3>系统</h3>
+					<div class="table">
+						<div class="tr"><div class="td" width="33%">主机名</div><div class="td">OpenWrt</div></div>
+						<div class="tr cbi-rowstyle-2"><div class="td">型号</div><div class="td">TR3000</div></div>
+						<div class="tr"><div class="td">固件版本</div><div class="td">ImmortalWrt 24.10</div></div>
+						<div class="tr cbi-rowstyle-2"><div class="td">运行时间</div><div class="td">2 天 4 小时</div></div>
+					</div>
+				</section>
+
+				<section class="cbi-section">
+					<h3>内存</h3>
+					<p class="cbi-section-descr">可用 186 MB / 总计 256 MB</p>
+					<div class="cbi-progressbar" title="27%"><div style="width:27%"></div></div>
+					<p class="cbi-section-descr" style="margin-top:14px">存储 42 MB / 128 MB</p>
+					<div class="cbi-progressbar" title="33%"><div style="width:33%"></div></div>
+				</section>
+
+				<section class="cbi-section demo-wide">
+					<h3>实时负载</h3>
+					<div class="fresh-chart">
+						<ul class="fresh-chart-legend">
+							<li class="fresh-chart-load"><i style="background:var(--fresh-text)"></i> 负载</li>
+							<li class="fresh-chart-rx"><i style="background:var(--success-color-medium)"></i> 下行</li>
+							<li class="fresh-chart-tx"><i style="background:var(--error-color-medium)"></i> 上行</li>
+						</ul>
+						<svg viewBox="0 0 640 220" width="100%" height="220" role="img" aria-label="负载示意">
+							<line x1="48" y1="24" x2="624" y2="24" style="stroke:black;stroke-width:0.6"/>
+							<line x1="48" y1="80" x2="624" y2="80" style="stroke:black;stroke-width:0.6"/>
+							<line x1="48" y1="136" x2="624" y2="136" style="stroke:black;stroke-width:0.6"/>
+							<line x1="48" y1="192" x2="624" y2="192" style="stroke:black;stroke-width:0.6"/>
+							<text x="8" y="28" style="fill:#999999;font-size:11px">1.00</text>
+							<text x="8" y="84" style="fill:#999999;font-size:11px">0.66</text>
+							<text x="8" y="140" style="fill:#999999;font-size:11px">0.33</text>
+							<text x="8" y="196" style="fill:#999999;font-size:11px">0</text>
+							<polyline class="fresh-chart-load" fill="none" stroke-width="2" points="48,168 110,150 172,142 234,128 296,136 358,118 420,124 482,108 544,112 624,96"/>
+							<polyline class="fresh-chart-rx" fill="none" stroke-width="1.6" points="48,176 110,170 172,162 234,158 296,152 358,148 420,140 482,136 544,130 624,122"/>
+							<polyline class="fresh-chart-tx" fill="none" stroke-width="1.6" points="48,186 110,182 172,178 234,180 296,176 358,172 420,168 482,170 544,166 624,160"/>
+						</svg>
+					</div>
+				</section>
+
+				<section class="cbi-section demo-wide">
+					<h3>网络</h3>
+					<div class="network-status-table demo-iface-row">
+						<div class="ifacebox">
+							<div class="ifacebox-head active">WAN</div>
+							<div class="ifacebox-body">eth0<br>198.51.100.10<br><span class="ifacebadge">dhcp</span></div>
+						</div>
+						<div class="ifacebox">
+							<div class="ifacebox-head active">LAN</div>
+							<div class="ifacebox-body">br-lan<br>192.168.1.1<br><span class="zonebadge" style="--zone-color-rgb:34,197,94">lan</span></div>
+						</div>
+						<div class="ifacebox">
+							<div class="ifacebox-head">WWAN</div>
+							<div class="ifacebox-body">未连接<br><span class="ifacebadge">未配置</span></div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+
+		<div id="panel-system" class="demo-hidden">
+			<h2 name="content">系统属性</h2>
+			<ul class="tabs">
+				<li class="active"><a href="#system" aria-current="page">常规设置</a></li>
+				<li><a href="#system">日志</a></li>
+				<li><a href="#system">语言和时间</a></li>
+			</ul>
+
+			<div class="cbi-map">
+				<div class="cbi-section">
+					<h3>常规设置</h3>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="hostname">主机名</label>
+						<div class="cbi-value-field">
+							<input id="hostname" type="text" value="OpenWrt">
+							<div class="cbi-value-description">在网络中显示的设备名称</div>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="timezone">时区</label>
+						<div class="cbi-value-field">
+							<select id="timezone">
+								<option>Asia/Shanghai</option>
+								<option>UTC</option>
+							</select>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="logging">记录系统日志</label>
+						<div class="cbi-value-field">
+							<input id="logging" type="checkbox" class="cbi-input-checkbox" checked>
+							<div class="cbi-value-description">写入本地环形缓冲区</div>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="wifi">启用无线</label>
+						<div class="cbi-value-field">
+							<input id="wifi" type="checkbox" class="cbi-input-checkbox">
+							<div class="cbi-value-description">关闭后 2.4 GHz / 5 GHz 都将停用</div>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="ipv6">IPv6</label>
+						<div class="cbi-value-field">
+							<input type="hidden" value="0">
+							<input id="ipv6" type="checkbox" class="cbi-input-checkbox" checked>
+							<div class="cbi-value-description">为 LAN 分配 IPv6 地址</div>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title">加密方式</label>
+						<div class="cbi-value-field">
+							<label class="cbi-radio"><input type="radio" name="enc" checked> WPA2</label>
+							<label class="cbi-radio"><input type="radio" name="enc"> WPA3</label>
+							<label class="cbi-radio"><input type="radio" name="enc"> 混合</label>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title">协议</label>
+						<div class="cbi-value-field">
+							<label class="cbi-checkbox"><input type="checkbox" checked> IPv4</label>
+							<label class="cbi-checkbox"><input type="checkbox" checked> IPv6</label>
+							<label class="cbi-checkbox"><input type="checkbox"> 自定义 DNS</label>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="channel">信道</label>
+						<div class="cbi-value-field">
+							<div class="cbi-select">
+								<select id="channel">
+									<option>自动</option>
+									<option>36</option>
+									<option>40</option>
+									<option>44</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="txpower">发射功率</label>
+						<div class="cbi-value-field">
+							<input id="txpower" type="number" value="20" min="0" max="30">
+							<div class="cbi-value-description">单位 dBm</div>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="notes">备注</label>
+						<div class="cbi-value-field">
+							<textarea id="notes" class="cbi-input-textarea" rows="3">办公室 AP</textarea>
+						</div>
+					</div>
+					<div class="cbi-value">
+						<label class="cbi-value-title" for="readonly">只读项</label>
+						<div class="cbi-value-field">
+							<input id="readonly" type="text" value="eth0" readonly>
+						</div>
+					</div>
+				</div>
+				<div class="cbi-page-actions">
+					<button type="button" class="cbi-button cbi-button-reset">重置</button>
+					<button type="button" class="cbi-button cbi-button-save">保存</button>
+					<button type="button" class="cbi-button cbi-button-apply">保存并应用</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="panel-network" class="demo-hidden">
+			<h2 name="content">无线</h2>
+			<div class="alert-message info">
+				<h4>2.4 GHz 与 5 GHz 已启用</h4>
+				<p>当前有 3 台设备关联。</p>
+			</div>
+			<div class="cbi-section">
+				<h3>关联设备</h3>
+				<div class="table">
+					<div class="tr table-titles">
+						<div class="th"><input type="checkbox" aria-label="全选"></div>
+						<div class="th">主机</div>
+						<div class="th">MAC</div>
+						<div class="th">信号</div>
+						<div class="th cbi-section-actions"></div>
+					</div>
+					<div class="tr">
+						<div class="td"><input type="checkbox" checked></div>
+						<div class="td">Studio</div>
+						<div class="td"><code>AA:BB:CC:11:22:33</code></div>
+						<div class="td"><span class="ifacebadge signal-badge signal-strong">-42 dBm</span></div>
+						<div class="td cbi-section-actions"><button type="button" class="cbi-button">断开</button></div>
+					</div>
+					<div class="tr cbi-rowstyle-2">
+						<div class="td"><input type="checkbox"></div>
+						<div class="td">Phone</div>
+						<div class="td"><code>AA:BB:CC:44:55:66</code></div>
+						<div class="td"><span class="ifacebadge signal-badge signal-fair">-71 dBm</span></div>
+						<div class="td cbi-section-actions"><button type="button" class="cbi-button">断开</button></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="panel-services" class="demo-hidden">
+			<h2 name="content">组件演示</h2>
+			<div class="alert-message success"><h4>已保存</h4><p>配置已写入，无需重启。</p></div>
+			<div class="alert-message error"><h4>接口错误</h4><p>WAN 无法获取地址。</p></div>
+
+			<div class="cbi-section">
+				<h3>操作</h3>
+				<p class="cbi-section-descr">弹窗、确认框与登录页均可在此预览。</p>
+				<div class="demo-actions">
+					<button type="button" class="btn" data-open="modal-confirm">确认弹窗</button>
+					<button type="button" class="cbi-button-action" data-open="modal-form">表单弹窗</button>
+					<button type="button" class="cbi-button-negative" data-open="modal-danger">危险操作</button>
+					<button type="button" class="cbi-button-link" data-open="login">登录页</button>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<footer>
+		<span>Fresh 0.2.2 · 浅白主调 · 自动深色 · 切换动画</span>
+		<ul class="breadcrumb pull-right" id="modemenu">
+			<li class="active"><a href="#overview">管理</a></li>
+			<li><a href="#login">命令行</a></li>
+		</ul>
+	</footer>
+
+	<div id="modal_overlay" role="presentation">
+		<div class="modal demo-hidden" id="modal-confirm" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+			<h4 id="confirm-title">应用更改？</h4>
+			<p>新的防火墙规则将立即生效，现有连接可能会短暂中断。</p>
+			<div class="right">
+				<button type="button" class="btn" data-close>取消</button>
+				<button type="button" class="cbi-button-apply" data-close>应用</button>
+			</div>
+		</div>
+		<div class="modal demo-hidden" id="modal-form" role="dialog" aria-modal="true" aria-labelledby="form-title">
+			<h4 id="form-title">添加静态租约</h4>
+			<div class="cbi-value">
+				<label class="cbi-value-title" for="lease-name">主机名</label>
+				<div class="cbi-value-field"><input id="lease-name" type="text" placeholder="studio"></div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-value-title" for="lease-ip">IPv4 地址</label>
+				<div class="cbi-value-field"><input id="lease-ip" type="text" placeholder="192.168.1.40"></div>
+			</div>
+			<div class="right">
+				<button type="button" class="btn" data-close>取消</button>
+				<button type="button" class="cbi-button-save" data-close>保存</button>
+			</div>
+		</div>
+		<div class="modal demo-hidden" id="modal-danger" role="dialog" aria-modal="true" aria-labelledby="danger-title">
+			<h4 id="danger-title">恢复出厂设置</h4>
+			<p>设备将清除全部配置并重启。此操作无法撤销。</p>
+			<div class="right">
+				<button type="button" class="btn" data-close>取消</button>
+				<button type="button" class="cbi-button-negative" data-close>清除并重启</button>
+			</div>
+		</div>
+		<div class="modal demo-hidden" id="modal-password" role="dialog" aria-modal="true" aria-labelledby="pwd-title">
+			<h4 id="pwd-title">设置管理员密码</h4>
+			<div class="cbi-value">
+				<label class="cbi-value-title" for="pwd">新密码</label>
+				<div class="cbi-value-field"><input id="pwd" type="password"></div>
+			</div>
+			<div class="right">
+				<button type="button" class="btn" data-close>取消</button>
+				<button type="button" class="cbi-button-apply" data-close>保存</button>
+			</div>
+		</div>
+		<div class="modal login demo-hidden" id="modal-login" role="dialog" aria-modal="true" aria-labelledby="login-title">
+			<h4 id="login-title">登录</h4>
+			<p class="fresh-login-host">OpenWrt</p>
+			<form class="cbi-map fresh-login-form" onsubmit="return false">
+				<div class="cbi-section">
+					<div class="cbi-section-node">
+						<div class="cbi-value">
+							<label class="cbi-value-title" for="luci_username">用户名</label>
+							<div class="cbi-value-field"><input id="luci_username" type="text" value="root" autocomplete="username"></div>
+						</div>
+						<div class="cbi-value">
+							<label class="cbi-value-title" for="luci_password">密码</label>
+							<div class="cbi-value-field"><input id="luci_password" type="password" autocomplete="current-password"></div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<button class="btn cbi-button-positive important" type="button" data-login-submit>登录</button>
+		</div>
+	</div>
+	<div id="demo-login-splash" class="spinning demo-hidden">正在加载…</div>
+
+	<script>
+		(function() {
+			var panels = {
+				overview: document.getElementById('panel-overview'),
+				system: document.getElementById('panel-system'),
+				network: document.getElementById('panel-network'),
+				services: document.getElementById('panel-services')
+			};
+			var overlay = document.getElementById('modal_overlay');
+			var splash = document.getElementById('demo-login-splash');
+			var loginDlg = document.getElementById('modal-login');
+			var navLinks = document.querySelectorAll('[data-nav]');
+			var dropdowns = document.querySelectorAll('#topmenu > .dropdown > a.menu');
+			var loginTimer = 0;
+			var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+			function resetLogin() {
+				window.clearTimeout(loginTimer);
+				document.body.classList.remove('fresh-login-ready', 'fresh-login-busy', 'fresh-login-leave');
+				loginDlg.classList.remove('fresh-login-busy');
+				loginDlg.removeAttribute('aria-busy');
+				var submit = loginDlg.querySelector('[data-login-submit]');
+				if (submit) submit.disabled = false;
+				var status = loginDlg.querySelector('.fresh-login-status');
+				if (status) status.remove();
+				splash.classList.add('demo-hidden');
+			}
+
+			function showLogin() {
+				Object.keys(panels).forEach(function(key) {
+					panels[key].classList.add('demo-hidden');
+				});
+				navLinks.forEach(function(link) {
+					link.parentNode.classList.remove('active');
+					link.removeAttribute('aria-current');
+				});
+				resetLogin();
+				document.body.classList.add('fresh-login-page');
+				document.body.classList.remove('modal-overlay-active');
+				overlay.querySelectorAll('.modal').forEach(function(node) {
+					node.classList.add('demo-hidden');
+				});
+				splash.classList.remove('demo-hidden');
+				loginTimer = window.setTimeout(function() {
+					splash.classList.add('demo-hidden');
+					openModal('modal-login');
+					document.body.classList.add('fresh-login-ready');
+					var password = document.getElementById('luci_password');
+					if (password) password.focus();
+				}, reduce.matches ? 0 : 420);
+			}
+
+			function showPanel(name) {
+				if (name === 'login') {
+					showLogin();
+					return;
+				}
+				resetLogin();
+				Object.keys(panels).forEach(function(key) {
+					panels[key].classList.toggle('demo-hidden', key !== name);
+				});
+				navLinks.forEach(function(link) {
+					var active = link.getAttribute('data-nav') === name;
+					link.parentNode.classList.toggle('active', active);
+					if (active) link.setAttribute('aria-current', 'page');
+					else link.removeAttribute('aria-current');
+				});
+				document.body.classList.remove('fresh-login-page');
+				closeModal();
+				document.body.setAttribute('data-page', 'admin-status-overview');
+			}
+
+			function openModal(id) {
+				overlay.querySelectorAll('.modal').forEach(function(node) {
+					node.classList.toggle('demo-hidden', node.id !== id);
+				});
+				document.body.classList.add('modal-overlay-active');
+				document.body.classList.toggle('fresh-login-page', id === 'modal-login');
+			}
+
+			function closeModal() {
+				if (location.hash.replace('#', '') === 'login') return;
+				document.body.classList.remove('modal-overlay-active');
+				document.body.classList.remove('fresh-login-page', 'fresh-login-ready', 'fresh-login-busy', 'fresh-login-leave');
+				overlay.querySelectorAll('.modal').forEach(function(node) {
+					node.classList.add('demo-hidden');
+				});
+			}
+
+			function route() {
+				var name = (location.hash || '#overview').slice(1);
+				if (name === 'login') {
+					showPanel('login');
+					return;
+				}
+				if (!panels[name]) name = 'overview';
+				showPanel(name);
+			}
+
+			navLinks.forEach(function(link) {
+				link.addEventListener('click', function() {
+					dropdowns.forEach(function(other) {
+						other.parentNode.classList.remove('open');
+						other.setAttribute('aria-expanded', 'false');
+					});
+				});
+			});
+
+			dropdowns.forEach(function(link) {
+				link.addEventListener('click', function(ev) {
+					if (window.matchMedia('(max-width: 854px)').matches || link.getAttribute('aria-haspopup') === 'true') {
+						ev.preventDefault();
+						var item = link.parentNode;
+						var open = !item.classList.contains('open');
+						dropdowns.forEach(function(other) {
+							other.parentNode.classList.remove('open');
+							other.setAttribute('aria-expanded', 'false');
+						});
+						item.classList.toggle('open', open);
+						link.setAttribute('aria-expanded', open ? 'true' : 'false');
+					}
+				});
+			});
+
+			document.addEventListener('click', function(ev) {
+				if (!ev.target.closest || ev.target.closest('#topmenu > .dropdown')) return;
+				dropdowns.forEach(function(link) {
+					link.parentNode.classList.remove('open');
+					link.setAttribute('aria-expanded', 'false');
+				});
+			});
+
+			document.querySelectorAll('[data-open]').forEach(function(btn) {
+				btn.addEventListener('click', function() {
+					var id = btn.getAttribute('data-open');
+					if (id === 'login') {
+						location.hash = 'login';
+						return;
+					}
+					openModal(id);
+				});
+			});
+
+			document.querySelectorAll('[data-close]').forEach(function(btn) {
+				btn.addEventListener('click', function() {
+					if (location.hash.replace('#', '') === 'login') location.hash = 'services';
+					else closeModal();
+				});
+			});
+
+			document.querySelectorAll('[data-login-submit]').forEach(function(btn) {
+				btn.addEventListener('click', function() {
+					if (btn.disabled) return;
+					btn.disabled = true;
+					loginDlg.setAttribute('aria-busy', 'true');
+					document.body.classList.add('fresh-login-busy');
+					loginDlg.classList.add('fresh-login-busy');
+					if (!loginDlg.querySelector('.fresh-login-status')) {
+						var status = document.createElement('div');
+						status.className = 'fresh-login-status';
+						status.innerHTML = '<span class="fresh-login-spinner" aria-hidden="true"></span><span>正在登录…</span>';
+						loginDlg.appendChild(status);
+					}
+					window.setTimeout(function() {
+						document.body.classList.add('fresh-login-leave');
+						window.setTimeout(function() {
+							location.hash = 'overview';
+						}, reduce.matches ? 0 : 260);
+					}, reduce.matches ? 0 : 720);
+				});
+			});
+
+			overlay.addEventListener('click', function(ev) {
+				if (ev.target === overlay && location.hash.replace('#', '') !== 'login')
+					closeModal();
+			});
+
+			document.addEventListener('keydown', function(ev) {
+				if (ev.key === 'Escape') closeModal();
+			});
+
+			window.addEventListener('hashchange', route);
+			route();
+		})();
+	</script>
+</body>
+</html>

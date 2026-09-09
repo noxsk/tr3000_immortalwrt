@@ -16,6 +16,12 @@
 - 在 MT7981 AX3000 普通版和 DAE 版预设中启用 Mwan3、LuCI 管理界面及简体中文翻译。
 - 增加 Cudy TR3000 v1 原厂 64M UBI 和 MOD U-Boot 112M UBI 两套专用配置、Linux 构建脚本及 GitHub Actions 工作流。
 
+### 2026-09-07
+
+- 对照上游 `padavanonly/immortalwrt-mt798x-6.6` 的 `openwrt-24.10-6.6`：导入基线 `31d05c7` 之后到 `ec9ef10`（2026-07-23）共 12 个提交。
+- 只摘 TR3000 会用到的部分：mt_wifi/iwinfo 信道分析与扫描丢包、`ifdown` 符号链接、uhttpd ubus POST 256KB、停止覆盖 LuCI Channel Analysis 菜单。
+- 未摘 Nradio / Netcore 机型与法国频段修正。同步方法与对照表见 `UPSTREAM_SYNC.md`。
+
 ### 2026-07-01
 
 - 找到 AdGuard Home “未集成”的原因：此前只启用了官方 `adguardhome` 后端包，并按旧决策刻意没有加入 LuCI 入口。
@@ -30,11 +36,10 @@
 
 - 仓库：<https://github.com/padavanonly/immortalwrt-mt798x-6.6>
 - 分支：`openwrt-24.10-6.6`
-- 提交：`31d05c7d835d50f10597fbab0eab14258b2c17e7`
-- 提交时间：`2026-06-26T17:16:22+08:00`
-- 提交说明：`Merge pull request #404 from Yuzhii0718/mtk-switch`
-- 导入日期：`2026-06-30`
-- 说明：仅导入源码文件，未保留上游仓库的 `.git` 记录；后续同步以上述提交为比较基线。
+- 导入提交：`31d05c7d835d50f10597fbab0eab14258b2c17e7`（2026-06-26，PR #404）
+- 已审阅到：`ec9ef10efc65da1e6d1de4e2c043c0e13d08eed8`（2026-07-23，上游当前 HEAD）
+- 策略：只摘 TR3000 相关修复，不整树合并。流程见 `UPSTREAM_SYNC.md`。
+- 说明：仅导入源码文件，未保留上游仓库的 `.git` 记录。
 
 ## 重要决策
 
